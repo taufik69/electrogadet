@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Search, ChevronDown, Loader2, PackageSearch } from "lucide-react"
 import type { Product } from "@/lib/types/product"
+import type { NavCategoryTreeNode } from "@/lib/types/category"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
 
@@ -11,14 +12,24 @@ function formatPrice(cents: number): string {
   return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" })
 }
 
-export function SearchBar() {
+interface SearchBarProps {
+  categories?: NavCategoryTreeNode[]
+}
+
+export function SearchBar({ categories = [] }: SearchBarProps) {
   const router = useRouter()
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<Product[]>([])
   const [loading, setLoading] = useState(false)
   const [focused, setFocused] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
+  const [scopeOpen, setScopeOpen] = useState(false)
+  const [scope, setScope] = useState<{ label: string; slug: string | null }>({
+    label: "All",
+    slug: null,
+  })
   const containerRef = useRef<HTMLDivElement>(null)
+  const scopeRef = useRef<HTMLDivElement>(null)
   const requestIdRef = useRef(0)
 
   const trimmedQuery = query.trim()
@@ -27,6 +38,9 @@ export function SearchBar() {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setFocused(false)
+      }
+      if (scopeRef.current && !scopeRef.current.contains(event.target as Node)) {
+        setScopeOpen(false)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
@@ -79,7 +93,9 @@ export function SearchBar() {
   function submitSearch() {
     if (!trimmedQuery) return
     setFocused(false)
-    router.push(`/products?q=${encodeURIComponent(trimmedQuery)}`)
+    const params = new URLSearchParams({ q: trimmedQuery })
+    if (scope.slug) params.set("category", scope.slug)
+    router.push(`/products?${params.toString()}`)
   }
 
   function handleInputKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -102,15 +118,68 @@ export function SearchBar() {
   }
 
   return (
-    <div ref={containerRef} className="relative flex w-full max-w-2xl items-center">
-      <div className="flex h-11 w-full items-center overflow-hidden rounded-full border border-border bg-bg-section focus-within:ring-2 focus-within:ring-brand-primary/40">
-        <button
-          type="button"
-          className="text-small hidden shrink-0 items-center gap-1 border-r border-border px-4 text-text-secondary transition-colors hover:text-text-primary sm:flex"
-        >
-          All
-          <ChevronDown size={14} aria-hidden="true" />
-        </button>
+    <div ref={containerRef} className="relative flex w-full max-w-4xl items-center">
+      <div className="flex h-12 w-full items-center rounded-full bg-bg-section p-1 pl-0 focus-within:ring-2 focus-within:ring-brand-primary/40">
+        <div ref={scopeRef} className="relative hidden shrink-0 items-center sm:flex">
+          <button
+            type="button"
+            onClick={() => setScopeOpen((prev) => !prev)}
+            aria-haspopup="listbox"
+            aria-expanded={scopeOpen}
+            className="text-small flex h-full shrink-0 items-center gap-1 pl-5 pr-4 text-text-secondary transition-colors hover:text-text-primary"
+          >
+            {scope.label}
+            <ChevronDown
+              size={14}
+              aria-hidden="true"
+              className={`transition-transform duration-150 ${scopeOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+          <span className="h-5 w-px shrink-0 bg-border" aria-hidden="true" />
+
+          {scopeOpen && (
+            <div
+              role="listbox"
+              className="shadow-e3 absolute top-full left-0 z-50 mt-2 max-h-96 w-56 overflow-y-auto rounded-lg border border-border bg-surface p-1.5"
+            >
+              <button
+                type="button"
+                role="option"
+                aria-selected={scope.slug === null}
+                onClick={() => {
+                  setScope({ label: "All", slug: null })
+                  setScopeOpen(false)
+                }}
+                className={`text-small w-full rounded-md px-3 py-2 text-left transition-colors ${
+                  scope.slug === null
+                    ? "text-small-semibold bg-danger/10 text-danger"
+                    : "text-text-primary hover:bg-bg-section"
+                }`}
+              >
+                All
+              </button>
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  role="option"
+                  aria-selected={scope.slug === category.slug}
+                  onClick={() => {
+                    setScope({ label: category.name, slug: category.slug })
+                    setScopeOpen(false)
+                  }}
+                  className={`text-small w-full truncate rounded-md px-3 py-2 text-left transition-colors ${
+                    scope.slug === category.slug
+                      ? "text-small-semibold bg-danger/10 text-danger"
+                      : "text-text-primary hover:bg-bg-section"
+                  }`}
+                >
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <input
           value={query}
           onChange={(event) => {
@@ -129,7 +198,7 @@ export function SearchBar() {
           type="button"
           onClick={submitSearch}
           aria-label="Search"
-          className="text-small-semibold flex h-full shrink-0 items-center gap-2 bg-text-primary px-5 text-white transition-colors hover:bg-text-primary/90"
+          className="text-small-semibold flex h-full shrink-0 items-center gap-2 rounded-full bg-text-primary px-5 text-white transition-colors hover:bg-text-primary/90"
         >
           <Search size={16} aria-hidden="true" />
           <span className="hidden sm:inline">Search</span>

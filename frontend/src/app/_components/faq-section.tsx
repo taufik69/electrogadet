@@ -53,7 +53,7 @@ const faqItems: FaqItem[] = [
 
 export function FaqSection() {
   return (
-    <section className="flex flex-col items-center gap-3 py-4 text-center">
+    <section className="flex flex-col items-center gap-3 text-center">
       <span className="text-caption inline-flex w-fit items-center gap-1.5 rounded-full bg-danger/10 px-3 py-1.5 font-bold uppercase tracking-wide text-danger">
         <span className="h-1.5 w-1.5 rounded-full bg-danger" />
         Help center

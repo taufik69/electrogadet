@@ -4,8 +4,8 @@ import { useSyncExternalStore } from "react"
 import Link from "next/link"
 import { ShoppingCart } from "lucide-react"
 
-const CART_STORAGE_KEY = "nordvolt-cart"
-const CART_UPDATED_EVENT = "nordvolt-cart-updated"
+const CART_STORAGE_KEY = "electrogadget-cart"
+const CART_UPDATED_EVENT = "electrogadget-cart-updated"
 
 function subscribe(onStoreChange: () => void) {
   window.addEventListener("storage", onStoreChange)
@@ -16,19 +16,21 @@ function subscribe(onStoreChange: () => void) {
   }
 }
 
+const DEFAULT_DEMO_COUNT = 3
+
 function getSnapshot(): number {
   try {
     const raw = localStorage.getItem(CART_STORAGE_KEY)
-    if (!raw) return 0
+    if (!raw) return DEFAULT_DEMO_COUNT
     const items = JSON.parse(raw) as Array<{ quantity: number }>
     return items.reduce((total, item) => total + item.quantity, 0)
   } catch {
-    return 0
+    return DEFAULT_DEMO_COUNT
   }
 }
 
 function getServerSnapshot(): number {
-  return 0
+  return DEFAULT_DEMO_COUNT
 }
 
 export function CartButton() {
@@ -38,14 +40,14 @@ export function CartButton() {
     <Link
       href="/cart"
       aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
-      className="relative flex flex-col items-center gap-0.5 text-text-primary transition-colors hover:text-brand-primary"
+      className="relative flex flex-col items-center gap-0.5 rounded-xl px-3 py-2 text-text-primary transition-colors hover:bg-bg-section hover:text-brand-primary"
     >
       <span className="relative">
         <ShoppingCart size={20} aria-hidden="true" />
         {count > 0 && (
           <span
             aria-hidden="true"
-            className="text-caption absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 font-semibold text-white"
+            className="text-caption absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 font-semibold text-white"
           >
             {count > 9 ? "9+" : count}
           </span>

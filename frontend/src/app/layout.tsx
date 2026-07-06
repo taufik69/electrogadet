@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Nordvolt — Premium Electronics",
+  title: "Electrogadget — Premium Electronics",
   description: "Premium electronics, curated for the modern home.",
 };
 
@@ -24,7 +24,9 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <AnnouncementBar />
+
         <Header />
+
         <main className="flex flex-1 flex-col">{children}</main>
         <Footer />
       </body>

@@ -7,6 +7,7 @@ import { BestSellers } from "./_components/best-sellers";
 import { NewArrivals } from "./_components/new-arrivals";
 import { WhyShopWithUs } from "./_components/why-shop-with-us";
 import { FaqSection } from "./_components/faq-section";
+import { FeaturedBrands } from "./_components/featured-brands";
 
 const mockProducts = [
   {
@@ -83,15 +84,21 @@ const mockProducts = [
 
 export default function Home() {
   return (
-    <Container className="flex flex-col gap-6 py-8">
+    <Container className="flex flex-col py-8 sm:py-10">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
         <HeroBanner />
         <PromoCards />
       </div>
 
-      <FlashSaleBanner />
+      <div className="mt-10 sm:mt-14">
+        <FlashSaleBanner />
+      </div>
 
-      <section className="flex flex-col gap-4">
+      <div className="mt-14 sm:mt-20">
+        <FeaturedBrands />
+      </div>
+
+      <section className="mt-14 flex flex-col gap-4 sm:mt-20">
         <h2 className="text-h3 text-text-primary">Popular right now</h2>
         <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
           {mockProducts.map((product) => (
@@ -100,12 +107,21 @@ export default function Home() {
         </div>
       </section>
 
-      <BestSellers />
+      <div className="mt-14 sm:mt-20">
+        <BestSellers />
+      </div>
 
-      <NewArrivals />
-      <WhyShopWithUs />
+      <div className="mt-14 sm:mt-20">
+        <NewArrivals />
+      </div>
 
-      <FaqSection />
+      <div className="mt-14 sm:mt-20">
+        <WhyShopWithUs />
+      </div>
+
+      <div className="mt-14 mb-6 sm:mt-20 sm:mb-10">
+        <FaqSection />
+      </div>
     </Container>
   );
 }
