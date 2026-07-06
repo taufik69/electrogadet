@@ -17,6 +17,8 @@ import {
   Truck,
 } from "lucide-react"
 import { cn, formatCurrency } from "@/lib/utils"
+import { useCart } from "@/hooks/use-cart"
+import { useWishlist } from "@/hooks/use-wishlist"
 import type { ProductDetail } from "@/lib/mock/mock-product-detail"
 
 interface ProductBuyBoxProps {
@@ -25,9 +27,12 @@ interface ProductBuyBoxProps {
 
 export function ProductBuyBox({ product }: ProductBuyBoxProps) {
   const [quantity, setQuantity] = useState(1)
-  const [wishlisted, setWishlisted] = useState(false)
+  const [justAdded, setJustAdded] = useState(false)
+  const { add } = useCart()
+  const { isWishlisted, toggle } = useWishlist()
 
   const {
+    slug,
     name,
     sellerName,
     isVerifiedSeller,
@@ -38,8 +43,41 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
     discountPercent,
     stockCount,
     soldCount,
+    images,
     specs,
   } = product
+
+  const wishlisted = isWishlisted(slug)
+
+  function handleAddToCart() {
+    add(
+      {
+        slug,
+        name,
+        imageUrl: images[0],
+        priceCents,
+        compareAtCents,
+        sellerName,
+        stockCount,
+      },
+      quantity,
+    )
+    setJustAdded(true)
+    setTimeout(() => setJustAdded(false), 1500)
+  }
+
+  function handleToggleWishlist() {
+    toggle({
+      slug,
+      name,
+      imageUrl: images[0],
+      priceCents,
+      compareAtCents,
+      discountPercent,
+      sellerName,
+      stockCount,
+    })
+  }
 
   const highlightSpecs = specs.filter((spec) =>
     ["Brand", "Model", "Color"].includes(spec.label),
@@ -180,10 +218,16 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          className="text-small-semibold flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border-2 border-text-primary text-text-primary transition-colors hover:bg-text-primary hover:text-white"
+          onClick={handleAddToCart}
+          className={cn(
+            "text-small-semibold flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border-2 transition-colors",
+            justAdded
+              ? "border-success bg-success text-white"
+              : "border-text-primary text-text-primary hover:bg-text-primary hover:text-white",
+          )}
         >
           <ShoppingCart size={17} aria-hidden="true" />
-          Add to Cart
+          {justAdded ? "Added!" : "Add to Cart"}
         </button>
         <button
           type="button"
@@ -193,7 +237,7 @@ export function ProductBuyBox({ product }: ProductBuyBoxProps) {
         </button>
         <button
           type="button"
-          onClick={() => setWishlisted((w) => !w)}
+          onClick={handleToggleWishlist}
           aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
           aria-pressed={wishlisted}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border text-text-primary transition-colors hover:bg-bg-section"

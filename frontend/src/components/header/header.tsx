@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Heart, User } from "lucide-react";
+import { User } from "lucide-react";
 import { SearchBar } from "./search-bar";
 import { CartButton } from "./cart-button";
+import { WishlistButton } from "./wishlist-button";
 import { MobileNav } from "./mobile-nav";
 import { MegaMenu } from "./mega-menu";
 import { Container } from "@/components/layout/container";
@@ -34,14 +35,7 @@ export async function Header() {
             <User size={20} aria-hidden="true" />
             <span className="text-caption">Sign in</span>
           </Link>
-          <Link
-            href="/wishlist"
-            aria-label="Wishlist"
-            className="hidden flex-col items-center gap-0.5 rounded-xl px-3 py-2 text-text-primary transition-colors hover:bg-bg-section hover:text-brand-primary md:flex"
-          >
-            <Heart size={20} aria-hidden="true" />
-            <span className="text-caption">Wishlist</span>
-          </Link>
+          <WishlistButton />
           <CartButton />
           <MobileNav categories={categories} />
         </div>

@@ -1,40 +1,11 @@
 "use client"
 
-import { useSyncExternalStore } from "react"
 import Link from "next/link"
 import { ShoppingCart } from "lucide-react"
-
-const CART_STORAGE_KEY = "electrogadget-cart"
-const CART_UPDATED_EVENT = "electrogadget-cart-updated"
-
-function subscribe(onStoreChange: () => void) {
-  window.addEventListener("storage", onStoreChange)
-  window.addEventListener(CART_UPDATED_EVENT, onStoreChange)
-  return () => {
-    window.removeEventListener("storage", onStoreChange)
-    window.removeEventListener(CART_UPDATED_EVENT, onStoreChange)
-  }
-}
-
-const DEFAULT_DEMO_COUNT = 3
-
-function getSnapshot(): number {
-  try {
-    const raw = localStorage.getItem(CART_STORAGE_KEY)
-    if (!raw) return DEFAULT_DEMO_COUNT
-    const items = JSON.parse(raw) as Array<{ quantity: number }>
-    return items.reduce((total, item) => total + item.quantity, 0)
-  } catch {
-    return DEFAULT_DEMO_COUNT
-  }
-}
-
-function getServerSnapshot(): number {
-  return DEFAULT_DEMO_COUNT
-}
+import { useCart } from "@/hooks/use-cart"
 
 export function CartButton() {
-  const count = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
+  const { itemCount: count } = useCart()
 
   return (
     <Link

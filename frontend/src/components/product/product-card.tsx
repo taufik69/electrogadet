@@ -1,7 +1,9 @@
 import Image from "next/image"
 import Link from "next/link"
-import { BadgeCheck, Eye, Heart, ShoppingCart } from "lucide-react"
+import { BadgeCheck, Eye } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
+import { AddToCartButton } from "./add-to-cart-button"
+import { WishlistButton } from "./wishlist-button"
 import type { ProductCardData } from "./types"
 
 const badgeLabel: Record<NonNullable<ProductCardData["badge"]>, string> = {
@@ -41,13 +43,9 @@ export function ProductCard({
           )}
         </div>
 
-        <button
-          type="button"
-          aria-label="Add to wishlist"
-          className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white text-text-primary shadow-e1 transition-colors hover:text-danger"
-        >
-          <Heart size={16} aria-hidden="true" />
-        </button>
+        <WishlistButton
+          product={{ slug, name, imageUrl, priceCents, compareAtCents, discountPercent, sellerName, stockCount }}
+        />
 
         <Link href={`/products/${slug}`} className="absolute inset-0">
           <Image
@@ -60,13 +58,9 @@ export function ProductCard({
         </Link>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex translate-y-full items-center gap-2 p-2 opacity-0 transition-all duration-200 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100">
-          <button
-            type="button"
-            className="text-small-semibold flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md bg-text-primary text-white transition-colors hover:bg-text-primary/90"
-          >
-            <ShoppingCart size={14} aria-hidden="true" />
-            Add to Cart
-          </button>
+          <AddToCartButton
+            product={{ slug, name, imageUrl, priceCents, compareAtCents, sellerName, stockCount }}
+          />
           <Link
             href={`/products/${slug}`}
             aria-label={`Quick view ${name}`}
