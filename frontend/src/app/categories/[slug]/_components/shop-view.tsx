@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import { PackageSearch } from "lucide-react"
 import { ProductCard } from "@/components/product/product-card"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import type { MockProduct } from "./mock-shop-products"
+import type { MockProduct } from "@/lib/mock/mock-shop-products"
 import { ShopFilters, DEFAULT_FILTERS, matchesFilters, PRICE_RANGES, type ShopFiltersState } from "./shop-filters"
 import { ShopToolbar, type SortOption } from "./shop-toolbar"
 

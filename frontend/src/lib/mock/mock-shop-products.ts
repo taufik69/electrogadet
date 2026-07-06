@@ -66,12 +66,11 @@ export function generateMockProducts(categoryName: string, count = 9): MockProdu
     const template = NAME_TEMPLATES[i % NAME_TEMPLATES.length]
     const name = template.replace("{brand}", brand).replace("{noun}", noun)
     const seller = SELLERS[i % SELLERS.length]
-    const basePrice = Math.round((300 + rand() * 4500) * 100) / 100
     const hasDiscount = rand() > 0.25
     const discountPercent = hasDiscount ? Math.round(15 + rand() * 60) : null
-    const priceCents = Math.round(basePrice * 100)
+    const priceCents = Math.round(300 + rand() * 4500) * 100
     const compareAtCents = discountPercent
-      ? Math.round(priceCents / (1 - discountPercent / 100))
+      ? Math.round(priceCents / (1 - discountPercent / 100) / 100) * 100
       : null
     const stockCount = Math.round(30 + rand() * 70)
     const soldCount = Math.round(rand() * stockCount * 0.8)

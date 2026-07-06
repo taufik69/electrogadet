@@ -19,11 +19,11 @@ export const DEFAULT_FILTERS: ShopFiltersState = {
 }
 
 const PRICE_RANGES = [
-  { id: "under-1000", label: "Under ৳1,000", min: 0, max: 100000 },
-  { id: "1000-5000", label: "৳1,000 - ৳5,000", min: 100000, max: 500000 },
-  { id: "5000-20000", label: "৳5,000 - ৳20,000", min: 500000, max: 2000000 },
-  { id: "20000-50000", label: "৳20,000 - ৳50,000", min: 2000000, max: 5000000 },
-  { id: "over-50000", label: "Over ৳50,000", min: 5000000, max: Infinity },
+  { id: "under-1000", label: "Under ₽1,000", min: 0, max: 100000 },
+  { id: "1000-5000", label: "₽1,000 - ₽5,000", min: 100000, max: 500000 },
+  { id: "5000-20000", label: "₽5,000 - ₽20,000", min: 500000, max: 2000000 },
+  { id: "20000-50000", label: "₽20,000 - ₽50,000", min: 2000000, max: 5000000 },
+  { id: "over-50000", label: "Over ₽50,000", min: 5000000, max: Infinity },
 ]
 
 const RATINGS = [4.5, 4, 3]

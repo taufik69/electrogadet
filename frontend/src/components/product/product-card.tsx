@@ -1,11 +1,8 @@
 import Image from "next/image"
 import Link from "next/link"
 import { BadgeCheck, Eye, Heart, ShoppingCart } from "lucide-react"
+import { formatCurrency } from "@/lib/utils"
 import type { ProductCardData } from "./types"
-
-function formatTaka(cents: number): string {
-  return `৳${(cents / 100).toLocaleString("en-US")}`
-}
 
 const badgeLabel: Record<NonNullable<ProductCardData["badge"]>, string> = {
   new: "New",
@@ -99,11 +96,11 @@ export function ProductCard({
 
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-h4 font-semibold text-text-primary">
-            {formatTaka(priceCents)}
+            {formatCurrency(priceCents)}
           </span>
           {compareAtCents !== null && (
             <span className="text-small text-text-secondary line-through">
-              {formatTaka(compareAtCents)}
+              {formatCurrency(compareAtCents)}
             </span>
           )}
         </div>

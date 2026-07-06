@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
+import { formatCurrency } from "@/lib/utils"
 
 interface SpotlightProduct {
   name: string
@@ -33,10 +34,6 @@ const spotlightProducts: SpotlightProduct[] = [
     badge: "Fast Gear",
   },
 ]
-
-function formatTaka(cents: number): string {
-  return `৳${(cents / 100).toLocaleString("en-US")}`
-}
 
 export function ProductSpotlight() {
   const [index, setIndex] = useState(0)
@@ -99,10 +96,10 @@ export function ProductSpotlight() {
           <p className="text-small truncate text-text-primary">{product.name}</p>
           <p className="flex items-baseline gap-2">
             <span className="text-h4 font-semibold text-text-primary">
-              {formatTaka(product.priceCents)}
+              {formatCurrency(product.priceCents)}
             </span>
             <span className="text-small text-text-secondary line-through">
-              {formatTaka(product.compareAtCents)}
+              {formatCurrency(product.compareAtCents)}
             </span>
           </p>
         </div>

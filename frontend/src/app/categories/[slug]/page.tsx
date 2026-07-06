@@ -5,7 +5,7 @@ import { getCategoryTree, findCategoryBySlug } from "@/lib/categories"
 import { CategoryHero } from "./_components/category-hero"
 import { SubcategoryGrid } from "./_components/subcategory-grid"
 import { ShopView } from "./_components/shop-view"
-import { generateMockProducts } from "./_components/mock-shop-products"
+import { generateMockProducts } from "@/lib/mock/mock-shop-products"
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>
