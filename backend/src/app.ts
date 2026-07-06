@@ -3,14 +3,18 @@ import cors from "cors"
 import helmet from "helmet"
 import { productRouter } from "./modules/product/product.routes.js"
 import { announcementRouter } from "./modules/announcement/announcement.routes.js"
+import { categoryRouter } from "./modules/category/category.routes.js"
 import { errorHandler } from "./shared/middlewares/errorHandler.js"
+import { PUBLIC_DIR } from "./shared/middlewares/upload.js"
 
 export const app = express()
 
-app.use(helmet())
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }))
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+app.use("/public", express.static(PUBLIC_DIR))
 
 
 app.get("/health", (_req, res) => {
@@ -19,5 +23,6 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/products", productRouter)
 app.use("/api/announcements", announcementRouter)
+app.use("/api/categories", categoryRouter)
 
 app.use(errorHandler)
