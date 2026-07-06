@@ -83,7 +83,7 @@ export async function AnnouncementBar() {
         data-announcement-id={announcement.id}
         className="relative flex items-center gap-4 overflow-hidden bg-[#0b1120] py-2 text-white"
       >
-        <div className="flex min-w-0 flex-1 overflow-hidden">
+        <div className="announcement-marquee-viewport flex min-w-0 flex-1 overflow-hidden">
           <div className="announcement-marquee flex shrink-0 items-center">
             {renderTrack(false)}
             {renderTrack(true)}
@@ -100,6 +100,9 @@ export async function AnnouncementBar() {
           animation:
             announcement-marquee-enter 25s linear 1,
             announcement-marquee-loop 35s linear 34s infinite;
+        }
+        .announcement-marquee-viewport:hover .announcement-marquee {
+          animation-play-state: paused;
         }
         @keyframes announcement-marquee-enter {
           from {

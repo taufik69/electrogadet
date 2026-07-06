@@ -41,20 +41,54 @@ export function FeaturedBrands() {
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-border p-4">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-          {brands.map((brand) => (
-            <Link
-              key={brand.slug}
-              href={`/brands/${brand.slug}`}
-              aria-label={`Shop ${brand.name}`}
-              className="flex h-20 items-center justify-center rounded-xl bg-bg-section px-4 text-text-primary transition-all hover:-translate-y-0.5 hover:bg-surface hover:shadow-e2"
-            >
-              <span className={brand.wordmarkClassName}>{brand.name}</span>
-            </Link>
-          ))}
+      <div className="overflow-hidden rounded-2xl border border-border p-4">
+        <div className="brand-marquee-viewport overflow-hidden">
+          <div className="brand-marquee flex w-max shrink-0 items-center gap-3">
+            {brands.map((brand) => (
+              <BrandTile key={`a-${brand.slug}`} brand={brand} />
+            ))}
+            {brands.map((brand) => (
+              <BrandTile key={`b-${brand.slug}`} brand={brand} hidden />
+            ))}
+          </div>
         </div>
       </div>
+
+      <style>{`
+        .brand-marquee {
+          animation: brand-marquee-loop 28s linear infinite;
+        }
+        .brand-marquee-viewport:hover .brand-marquee {
+          animation-play-state: paused;
+        }
+        @keyframes brand-marquee-loop {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .brand-marquee {
+            animation: none;
+          }
+        }
+      `}</style>
     </section>
+  )
+}
+
+function BrandTile({ brand, hidden }: { brand: Brand; hidden?: boolean }) {
+  return (
+    <Link
+      href={`/brands/${brand.slug}`}
+      aria-label={`Shop ${brand.name}`}
+      aria-hidden={hidden || undefined}
+      tabIndex={hidden ? -1 : undefined}
+      className="flex h-20 w-40 shrink-0 items-center justify-center rounded-xl bg-bg-section px-4 text-text-primary transition-all hover:-translate-y-0.5 hover:bg-surface hover:shadow-e2 sm:w-48"
+    >
+      <span className={brand.wordmarkClassName}>{brand.name}</span>
+    </Link>
   )
 }
