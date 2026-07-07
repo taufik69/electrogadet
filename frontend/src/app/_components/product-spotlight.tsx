@@ -18,8 +18,8 @@ interface ProductSpotlightProps {
 
 export function ProductSpotlight({ product, priority }: ProductSpotlightProps) {
   return (
-    <div className="w-full max-w-xs shrink-0 overflow-hidden rounded-2xl bg-white text-text-primary shadow-2xl">
-      <div className="relative aspect-square bg-bg-section">
+    <div className="w-full max-w-[500px] shrink-0 overflow-hidden rounded-2xl bg-white text-text-primary shadow-2xl md:w-1/2 lg:max-w-[600px]">
+      <div className="relative aspect-video sm:aspect-[4/3] md:aspect-auto md:h-[300px] lg:h-[350px] bg-bg-section">
         <span className="text-caption absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full bg-white px-2.5 py-1 font-semibold text-text-primary shadow-e1">
           <CheckCircle2 size={12} className="text-success" aria-hidden="true" />
           {product.badge}
@@ -32,7 +32,7 @@ export function ProductSpotlight({ product, priority }: ProductSpotlightProps) {
           src={product.imageUrl}
           alt={product.name}
           fill
-          sizes="320px"
+          sizes="(max-width: 768px) 100vw, 600px"
           className="pointer-events-none object-cover"
           priority={priority}
         />
