@@ -28,16 +28,16 @@ export function ProductCard({
   const soldRatio = hasStock ? Math.min(1, soldCount! / stockCount!) : 0
 
   return (
-    <div className="group relative flex w-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-shadow hover:shadow-e2">
+    <div className="group relative flex w-full flex-col overflow-hidden rounded-xl border border-border bg-surface transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl">
       <div className="relative aspect-square overflow-hidden bg-bg-section">
         <div className="absolute left-2 top-2 z-10 flex items-center gap-1.5">
           {discountPercent !== null && (
-            <span className="text-caption rounded-full bg-danger px-2 py-1 font-bold text-white">
+            <span className="text-caption rounded-full bg-danger px-2 py-1 font-bold text-white transition-transform duration-500 group-hover:scale-105">
               -{discountPercent}%
             </span>
           )}
           {badge && (
-            <span className="text-caption rounded-full bg-success px-2 py-1 font-semibold text-white">
+            <span className="text-caption rounded-full bg-success px-2 py-1 font-semibold text-white transition-transform duration-500 group-hover:scale-105">
               {badgeLabel[badge]}
             </span>
           )}
@@ -53,7 +53,7 @@ export function ProductCard({
             alt={name}
             fill
             sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 20vw"
-            className="object-cover"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
         </Link>
 

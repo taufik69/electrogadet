@@ -2,9 +2,20 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronDown, Menu } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Container } from "@/components/layout/container";
 import type { NavCategoryTreeNode } from "@/lib/types/category";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  // navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 
 const CLOSE_DELAY_MS = 150;
 
@@ -63,19 +74,64 @@ export function MegaMenu({
           </button>
         </div>
 
-        <nav
-          aria-label="Primary"
-          className="flex min-w-0 flex-1 items-center gap-6 overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden"
-        >
-          {navCategories.map((category) => (
-            <Link
-              key={category.id}
-              href={`/categories/${category.slug}`}
-              className="text-small-semibold shrink-0 whitespace-nowrap rounded px-3 py-2 text-text-primary transition-colors hover:bg-bg-section hover:text-brand-primary"
-            >
-              {category.name}
-            </Link>
-          ))}
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-6">
+          <NavigationMenu className="relative z-50">
+            <NavigationMenuList className="gap-1">
+              {navCategories.map((category) => (
+                <NavigationMenuItem key={category.id}>
+                  {category.children && category.children.length > 0 ? (
+                    <>
+                      <NavigationMenuTrigger className="text-small-semibold bg-transparent hover:bg-bg-section data-[state=open]:bg-bg-section data-[state=open]:text-brand-primary hover:text-brand-primary">
+                        {category.name}
+                      </NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <div className="grid w-[350px] gap-4 p-4 md:w-[500px] md:grid-cols-[200px_1fr] lg:w-[600px]">
+                          <NavigationMenuLink asChild>
+                            <Link
+                              className="group flex h-full w-full select-none flex-col justify-end rounded-lg bg-surface p-5 no-underline outline-none border border-border hover:border-brand-primary/40 hover:shadow-sm transition-all"
+                              href={`/categories/${category.slug}`}
+                            >
+                              {category.imageUrl && (
+                                <div className="relative mb-4 h-20 w-20 overflow-hidden rounded-full border border-border shadow-sm transition-transform duration-500 group-hover:scale-105">
+                                  <Image src={category.imageUrl} alt={category.name} fill className="object-cover" />
+                                </div>
+                              )}
+                              <div className="mb-2 mt-auto text-h5 font-semibold text-text-primary group-hover:text-brand-primary transition-colors">
+                                All {category.name}
+                              </div>
+                              <p className="text-small text-text-secondary">
+                                Explore the complete collection of {category.name}.
+                              </p>
+                            </Link>
+                          </NavigationMenuLink>
+                          <ul className="grid grid-cols-2 gap-x-2 gap-y-1">
+                            {category.children.map((child) => (
+                              <li key={child.id}>
+                                <NavigationMenuLink asChild>
+                                  <Link
+                                    href={`/categories/${child.slug}`}
+                                    className="block select-none rounded-md px-3 py-2.5 leading-none no-underline outline-none transition-colors hover:bg-bg-section hover:text-brand-primary focus:bg-bg-section focus:text-brand-primary"
+                                  >
+                                    <div className="text-small font-medium text-text-primary hover:text-brand-primary">{child.name}</div>
+                                  </Link>
+                                </NavigationMenuLink>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </NavigationMenuContent>
+                    </>
+                  ) : (
+                    <Link href={`/categories/${category.slug}`} legacyBehavior passHref>
+                      <NavigationMenuLink className="text-small-semibold inline-flex items-center justify-center rounded-md bg-transparent px-3 py-2 transition-colors hover:bg-bg-section hover:text-brand-primary">
+                        {category.name}
+                      </NavigationMenuLink>
+                    </Link>
+                  )}
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
 
           {clearance && (
             <Link
@@ -85,7 +141,7 @@ export function MegaMenu({
               {clearance.name}
             </Link>
           )}
-        </nav>
+        </div>
       </Container>
 
       {panelOpen && categories.length > 0 && (

@@ -42,7 +42,7 @@ const heroSlides: HeroSlide[] = [
     product: {
       name: "Vega Jeet Matt Black Half Face…",
       imageUrl:
-        "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=600&q=80",
+        "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=1200&q=100",
       priceCents: 224900,
       compareAtCents: 345000,
       discountPercent: 35,
@@ -62,7 +62,7 @@ const heroSlides: HeroSlide[] = [
     product: {
       name: "Studds Shifter Full Face Helmet",
       imageUrl:
-        "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&q=80",
+        "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200&q=100",
       priceCents: 189900,
       compareAtCents: 259900,
       discountPercent: 27,
