@@ -1,7 +1,6 @@
 import { Container } from "@/components/layout/container";
 import { ProductCard } from "@/components/product/product-card";
 import { HeroBanner } from "./_components/hero-banner";
-import { PromoCards } from "./_components/promo-cards";
 import { FlashSaleBanner } from "./_components/flash-sale-banner";
 import { BestSellers } from "./_components/best-sellers";
 import { NewArrivals } from "./_components/new-arrivals";
@@ -85,10 +84,7 @@ const mockProducts = [
 export default function Home() {
   return (
     <Container className="flex flex-col py-8 sm:py-10">
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]">
-        <HeroBanner />
-        <PromoCards />
-      </div>
+      <HeroBanner />
 
       <div className="mt-10 sm:mt-14">
         <FlashSaleBanner />

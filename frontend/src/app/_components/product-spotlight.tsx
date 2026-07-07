@@ -1,11 +1,8 @@
-"use client"
-
-import { useState } from "react"
 import Image from "next/image"
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowRight, CheckCircle2 } from "lucide-react"
 import { formatCurrency } from "@/lib/utils"
 
-interface SpotlightProduct {
+export interface SpotlightProduct {
   name: string
   imageUrl: string
   priceCents: number
@@ -14,35 +11,12 @@ interface SpotlightProduct {
   badge: string
 }
 
-const spotlightProducts: SpotlightProduct[] = [
-  {
-    name: "Vega Jeet Matt Black Half Face…",
-    imageUrl:
-      "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=600&q=80",
-    priceCents: 224900,
-    compareAtCents: 345000,
-    discountPercent: 35,
-    badge: "Fast Gear",
-  },
-  {
-    name: "Studds Shifter Full Face Helmet",
-    imageUrl:
-      "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=600&q=80",
-    priceCents: 189900,
-    compareAtCents: 259900,
-    discountPercent: 27,
-    badge: "Fast Gear",
-  },
-]
+interface ProductSpotlightProps {
+  product: SpotlightProduct
+  priority?: boolean
+}
 
-export function ProductSpotlight() {
-  const [index, setIndex] = useState(0)
-  const product = spotlightProducts[index]
-
-  function goTo(next: number) {
-    setIndex((next + spotlightProducts.length) % spotlightProducts.length)
-  }
-
+export function ProductSpotlight({ product, priority }: ProductSpotlightProps) {
   return (
     <div className="w-full max-w-xs shrink-0 overflow-hidden rounded-2xl bg-white text-text-primary shadow-2xl">
       <div className="relative aspect-square bg-bg-section">
@@ -59,36 +33,9 @@ export function ProductSpotlight() {
           alt={product.name}
           fill
           sizes="320px"
-          className="object-cover"
+          className="pointer-events-none object-cover"
+          priority={priority}
         />
-
-        <button
-          type="button"
-          aria-label="Previous product"
-          onClick={() => goTo(index - 1)}
-          className="absolute left-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white text-text-primary shadow-e1 transition-colors hover:bg-bg-section"
-        >
-          <ChevronLeft size={16} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          aria-label="Next product"
-          onClick={() => goTo(index + 1)}
-          className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white text-text-primary shadow-e1 transition-colors hover:bg-bg-section"
-        >
-          <ChevronRight size={16} aria-hidden="true" />
-        </button>
-
-        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1">
-          {spotlightProducts.map((item, dotIndex) => (
-            <span
-              key={item.name}
-              className={`h-1.5 rounded-full transition-all ${
-                dotIndex === index ? "w-4 bg-danger" : "w-1.5 bg-text-secondary/30"
-              }`}
-            />
-          ))}
-        </div>
       </div>
 
       <div className="flex items-center justify-between gap-3 p-4">
