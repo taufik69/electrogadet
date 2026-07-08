@@ -1,5 +1,7 @@
 import { Container } from "@/components/layout/container";
 import { ProductCard } from "@/components/product/product-card";
+import { getActiveBanners } from "@/lib/banners";
+import { getActiveFlashSale } from "@/lib/flash-sales";
 import { HeroBanner } from "./_components/hero-banner";
 import { FlashSaleBanner } from "./_components/flash-sale-banner";
 import { BestSellers } from "./_components/best-sellers";
@@ -81,14 +83,18 @@ const mockProducts = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const [banners, flashSale] = await Promise.all([getActiveBanners(), getActiveFlashSale()]);
+
   return (
     <Container className="flex flex-col py-8 sm:py-10">
-      <HeroBanner />
+      <HeroBanner banners={banners} />
 
-      <div className="mt-10 sm:mt-14">
-        <FlashSaleBanner />
-      </div>
+      {flashSale && (
+        <div className="mt-10 sm:mt-14">
+          <FlashSaleBanner flashSale={flashSale} />
+        </div>
+      )}
 
       <div className="mt-14 sm:mt-20">
         <FeaturedBrands />

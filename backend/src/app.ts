@@ -4,6 +4,8 @@ import helmet from "helmet"
 import { productRouter } from "./modules/product/product.routes.js"
 import { announcementRouter } from "./modules/announcement/announcement.routes.js"
 import { categoryRouter } from "./modules/category/category.routes.js"
+import { bannerRouter } from "./modules/banner/banner.routes.js"
+import { flashSaleRouter } from "./modules/flash-sale/flash-sale.routes.js"
 import { errorHandler } from "./shared/middlewares/errorHandler.js"
 import { PUBLIC_DIR } from "./shared/middlewares/upload.js"
 
@@ -24,5 +26,7 @@ app.get("/health", (_req, res) => {
 app.use("/api/products", productRouter)
 app.use("/api/announcements", announcementRouter)
 app.use("/api/categories", categoryRouter)
+app.use("/api/banners", bannerRouter)
+app.use("/api/flash-sales", flashSaleRouter)
 
 app.use(errorHandler)

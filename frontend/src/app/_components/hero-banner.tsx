@@ -1,25 +1,22 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Autoplay, Pagination } from "swiper/modules"
 import { cn } from "@/lib/utils"
-import { ProductSpotlight, type SpotlightProduct } from "./product-spotlight"
+import { resolveMediaUrl } from "@/lib/media"
+import type { Banner } from "@/lib/types/banner"
 import "swiper/css"
 import "swiper/css/pagination"
 
 interface HeroSlide {
   id: string
-  eyebrow: string
   title: string
-  subtitle: string
-  ctaLabel: string
-  ctaHref: string
-  secondaryCtaLabel: string
-  secondaryCtaHref: string
+  imageUrl: string | null
+  href: string
   gradientClassName: string
-  product: SpotlightProduct
 }
 
 const features = [
@@ -28,50 +25,53 @@ const features = [
   { label: "7-day", sublabel: "Easy returns" },
 ]
 
-const heroSlides: HeroSlide[] = [
+const gradientClassNames = [
+  "from-[#0b0f19] via-[#0f1424] to-[#171523]",
+  "from-[#0f1424] via-[#131a2e] to-[#1a1430]",
+]
+
+const fallbackHeroSlides: HeroSlide[] = [
   {
     id: "slide-marketplace",
-    eyebrow: "Bangladesh's marketplace",
     title: "Online Shopping in Bangladesh, All in One Place",
-    subtitle: "Buy everything — pay Cash on Delivery",
-    ctaLabel: "Shop now",
-    ctaHref: "/products",
-    secondaryCtaLabel: "Browse categories",
-    secondaryCtaHref: "/categories",
-    gradientClassName: "from-[#0b0f19] via-[#0f1424] to-[#171523]",
-    product: {
-      name: "Vega Jeet Matt Black Half Face…",
-      imageUrl:
-        "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=1200&q=100",
-      priceCents: 224900,
-      compareAtCents: 345000,
-      discountPercent: 35,
-      badge: "Fast Gear",
-    },
+    imageUrl:
+      "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=1600&q=90",
+    href: "/products",
+    gradientClassName: gradientClassNames[0],
   },
   {
     id: "slide-electronics",
-    eyebrow: "New season lineup",
     title: "Premium Electronics, Delivered to Your Door",
-    subtitle: "Verified sellers, genuine warranty, fast delivery",
-    ctaLabel: "Shop electronics",
-    ctaHref: "/products",
-    secondaryCtaLabel: "View deals",
-    secondaryCtaHref: "/categories",
-    gradientClassName: "from-[#0f1424] via-[#131a2e] to-[#1a1430]",
-    product: {
-      name: "Studds Shifter Full Face Helmet",
-      imageUrl:
-        "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1200&q=100",
-      priceCents: 189900,
-      compareAtCents: 259900,
-      discountPercent: 27,
-      badge: "Fast Gear",
-    },
+    imageUrl:
+      "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=1600&q=90",
+    href: "/products",
+    gradientClassName: gradientClassNames[1],
   },
 ]
 
-export function HeroBanner() {
+function bannerHref(banner: Banner): string {
+  if (banner.product) return `/products/${banner.product.slug}`
+  if (banner.category) return `/categories/${banner.category.slug}`
+  return "/products"
+}
+
+function bannersToSlides(banners: Banner[]): HeroSlide[] {
+  return banners.map((banner, index) => ({
+    id: banner.id,
+    title: banner.title,
+    imageUrl: resolveMediaUrl(banner.imageUrl),
+    href: bannerHref(banner),
+    gradientClassName: gradientClassNames[index % gradientClassNames.length],
+  }))
+}
+
+interface HeroBannerProps {
+  banners?: Banner[]
+}
+
+export function HeroBanner({ banners = [] }: HeroBannerProps) {
+  const heroSlides = banners.length > 0 ? bannersToSlides(banners) : fallbackHeroSlides
+
   return (
     <div className="hero-banner relative overflow-hidden rounded-2xl">
       <Swiper
@@ -84,21 +84,30 @@ export function HeroBanner() {
       >
         {heroSlides.map((slide, slideIndex) => (
           <SwiperSlide key={slide.id}>
-            <div
+            <Link
+              href={slide.href}
               className={cn(
-                "flex flex-col gap-8 bg-gradient-to-br p-8 md:flex-row md:items-center md:justify-between md:p-12",
+                "group relative flex min-h-[320px] flex-col justify-end overflow-hidden bg-gradient-to-br p-8 md:min-h-[420px] md:p-12",
                 slide.gradientClassName,
               )}
             >
-              <div className="flex flex-1 flex-col items-start gap-6">
-                <span className="text-caption flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 font-semibold uppercase tracking-wide text-white/80">
-                  <span className="h-1.5 w-1.5 rounded-full bg-danger" aria-hidden="true" />
-                  {slide.eyebrow}
-                </span>
+              {slide.imageUrl && (
+                <Image
+                  src={slide.imageUrl}
+                  alt={slide.title}
+                  fill
+                  priority={slideIndex === 0}
+                  sizes="100vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              )}
+              <div
+                className={cn("absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent")}
+                aria-hidden="true"
+              />
 
+              <div className="relative flex flex-col items-start gap-6">
                 <h1 className="text-display max-w-lg text-white">{slide.title}</h1>
-
-                <p className="text-body-lg max-w-md text-white/60">{slide.subtitle}</p>
 
                 <div className="flex flex-wrap items-baseline gap-6">
                   {features.map((feature, i) => (
@@ -114,27 +123,14 @@ export function HeroBanner() {
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <Link
-                    href={slide.ctaHref}
-                    className="text-small-semibold flex items-center gap-2 rounded-full bg-white px-5 py-3 text-text-primary transition-colors hover:bg-white/90"
-                  >
-                    {slide.ctaLabel}
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-danger text-white">
-                      <ArrowRight size={12} aria-hidden="true" />
-                    </span>
-                  </Link>
-                  <Link
-                    href={slide.secondaryCtaHref}
-                    className="text-small-semibold rounded-full border border-white/20 px-5 py-3 text-white transition-colors hover:bg-white/10"
-                  >
-                    {slide.secondaryCtaLabel}
-                  </Link>
-                </div>
+                <span className="text-small-semibold flex items-center gap-2 rounded-full bg-white px-5 py-3 text-text-primary transition-colors group-hover:bg-white/90">
+                  Shop now
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-danger text-white">
+                    <ArrowRight size={12} aria-hidden="true" />
+                  </span>
+                </span>
               </div>
-
-              <ProductSpotlight product={slide.product} priority={slideIndex === 0} />
-            </div>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>

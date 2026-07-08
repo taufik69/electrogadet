@@ -13,12 +13,17 @@ datasource db {
 }
 
 model Product {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  priceCents Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  imageUrl       String?
+  priceCents     Int
+  compareAtCents Int?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  banners          Banner[]
+  flashSaleEntries FlashSaleProduct[]
 }
 
 model Category {
@@ -35,7 +40,56 @@ model Category {
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
 
+  banners Banner[]
+
   @@index([parentId])
+}
+
+model Banner {
+  id         String    @id @default(cuid())
+  title      String
+  imageUrl   String?
+  productId  String?
+  product    Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  isActive   Boolean   @default(true)
+  sortOrder  Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([isActive, sortOrder])
+  @@index([productId])
+  @@index([categoryId])
+}
+
+model FlashSale {
+  id        String   @id @default(cuid())
+  title     String
+  startsAt  DateTime
+  endsAt    DateTime
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products FlashSaleProduct[]
+
+  @@index([isActive, endsAt])
+}
+
+model FlashSaleProduct {
+  id             String    @id @default(cuid())
+  flashSaleId    String
+  flashSale      FlashSale @relation(fields: [flashSaleId], references: [id], onDelete: Cascade)
+  productId      String
+  product        Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  salePriceCents Int
+  sortOrder      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([flashSaleId, productId])
+  @@index([productId])
 }
 
 model AnnouncementBar {
