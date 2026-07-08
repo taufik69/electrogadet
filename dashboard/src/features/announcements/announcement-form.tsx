@@ -21,11 +21,6 @@ const formSchema = z.object({
   linkUrl: z.string().url("Must be a valid URL").or(z.literal("")).optional(),
   linkText: z.string().optional(),
   isActive: z.boolean(),
-  backgroundColor: z
-    .string()
-    .regex(/^#[0-9a-fA-F]{6}$/, "Must be a hex color like #RRGGBB")
-    .or(z.literal(""))
-    .optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
@@ -35,7 +30,6 @@ const defaultValues: FormValues = {
   linkUrl: "",
   linkText: "",
   isActive: false,
-  backgroundColor: "",
 }
 
 interface AnnouncementFormProps {
@@ -55,7 +49,6 @@ export function AnnouncementForm({ announcement, isPending, onSubmit, onCancel, 
           linkUrl: announcement.linkUrl ?? "",
           linkText: announcement.linkText ?? "",
           isActive: announcement.isActive,
-          backgroundColor: announcement.backgroundColor ?? "",
         }
       : defaultValues,
   })
@@ -66,7 +59,6 @@ export function AnnouncementForm({ announcement, isPending, onSubmit, onCancel, 
       linkUrl: values.linkUrl || undefined,
       linkText: values.linkText || undefined,
       isActive: values.isActive,
-      backgroundColor: values.backgroundColor || undefined,
     })
   }
 
@@ -114,19 +106,6 @@ export function AnnouncementForm({ announcement, isPending, onSubmit, onCancel, 
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="backgroundColor"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Background color (optional)</FormLabel>
-              <FormControl>
-                <Input placeholder="#111827" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <FormField
           control={form.control}
           name="isActive"

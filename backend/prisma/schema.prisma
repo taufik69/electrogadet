@@ -39,14 +39,11 @@ model Category {
 }
 
 model AnnouncementBar {
-  id              String    @id @default(cuid())
-  message         String
-  linkUrl         String?
-  linkText        String?
-  isActive        Boolean   @default(false)
-  startsAt        DateTime?
-  endsAt          DateTime?
-  backgroundColor String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  message   String
+  linkUrl   String?
+  linkText  String?
+  isActive  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

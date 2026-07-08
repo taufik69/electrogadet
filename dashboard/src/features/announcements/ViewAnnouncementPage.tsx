@@ -8,13 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { DeleteAnnouncementDialog } from "./delete-announcement-dialog"
 import { useAnnouncement } from "./hooks"
 
-function formatSchedule(startsAt: string | null, endsAt: string | null) {
-  if (!startsAt && !endsAt) return "Always on"
-  const start = startsAt ? new Date(startsAt).toLocaleString() : "…"
-  const end = endsAt ? new Date(endsAt).toLocaleString() : "…"
-  return `${start} – ${end}`
-}
-
 export function ViewAnnouncementPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -60,10 +53,7 @@ export function ViewAnnouncementPage() {
             </div>
           </div>
 
-          <div
-            className="flex items-center justify-center gap-2 rounded-md px-4 py-2 text-center text-white"
-            style={{ backgroundColor: announcement.backgroundColor ?? "#111827" }}
-          >
+          <div className="flex items-center justify-center gap-2 rounded-md bg-foreground px-4 py-2 text-center text-background">
             <span className="text-sm font-semibold">{announcement.message}</span>
             {announcement.linkText && (
               <span className="underline underline-offset-2">{announcement.linkText}</span>
@@ -86,12 +76,6 @@ export function ViewAnnouncementPage() {
 
             <dt className="text-muted-foreground">Link text</dt>
             <dd>{announcement.linkText ?? "—"}</dd>
-
-            <dt className="text-muted-foreground">Schedule</dt>
-            <dd>{formatSchedule(announcement.startsAt, announcement.endsAt)}</dd>
-
-            <dt className="text-muted-foreground">Background color</dt>
-            <dd>{announcement.backgroundColor ?? "—"}</dd>
 
             <dt className="text-muted-foreground">Created</dt>
             <dd>{new Date(announcement.createdAt).toLocaleString()}</dd>

@@ -15,14 +15,6 @@ import {
 } from "@/components/ui/table"
 import { DeleteAnnouncementDialog } from "./delete-announcement-dialog"
 import { useAnnouncements } from "./hooks"
-import type { AnnouncementBar } from "./types"
-
-function formatSchedule(announcement: AnnouncementBar) {
-  if (!announcement.startsAt && !announcement.endsAt) return "Always on"
-  const start = announcement.startsAt ? new Date(announcement.startsAt).toLocaleDateString() : "…"
-  const end = announcement.endsAt ? new Date(announcement.endsAt).toLocaleDateString() : "…"
-  return `${start} – ${end}`
-}
 
 export function AnnouncementsPage() {
   const { data: announcements, isLoading, isError, refetch } = useAnnouncements()
@@ -73,7 +65,6 @@ export function AnnouncementsPage() {
               <TableRow>
                 <TableHead>Message</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Schedule</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -91,7 +82,6 @@ export function AnnouncementsPage() {
                       {announcement.isActive ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{formatSchedule(announcement)}</TableCell>
                   <TableCell className="text-muted-foreground">
                     {new Date(announcement.updatedAt).toLocaleDateString()}
                   </TableCell>

@@ -7,9 +7,6 @@ export interface CreateAnnouncementInput {
   linkUrl?: string
   linkText?: string
   isActive?: boolean
-  startsAt?: string
-  endsAt?: string
-  backgroundColor?: string
 }
 
 export type UpdateAnnouncementInput = Partial<CreateAnnouncementInput>

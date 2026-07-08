@@ -15,38 +15,18 @@ export const announcementRepository = {
   },
 
   async findActive() {
-    const now = new Date()
     return prisma.announcementBar.findFirst({
-      where: {
-        isActive: true,
-        AND: [
-          { OR: [{ startsAt: null }, { startsAt: { lte: now } }] },
-          { OR: [{ endsAt: null }, { endsAt: { gte: now } }] },
-        ],
-      },
+      where: { isActive: true },
       orderBy: { updatedAt: "desc" },
     })
   },
 
   async create(data: CreateAnnouncementInput) {
-    return prisma.announcementBar.create({
-      data: {
-        ...data,
-        startsAt: data.startsAt ? new Date(data.startsAt) : undefined,
-        endsAt: data.endsAt ? new Date(data.endsAt) : undefined,
-      },
-    })
+    return prisma.announcementBar.create({ data })
   },
 
   async update(id: string, data: UpdateAnnouncementInput) {
-    return prisma.announcementBar.update({
-      where: { id },
-      data: {
-        ...data,
-        startsAt: data.startsAt ? new Date(data.startsAt) : undefined,
-        endsAt: data.endsAt ? new Date(data.endsAt) : undefined,
-      },
-    })
+    return prisma.announcementBar.update({ where: { id }, data })
   },
 
   async deactivateAllExcept(id: string) {
