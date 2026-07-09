@@ -9,9 +9,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export const PUBLIC_DIR = path.resolve(__dirname, "../../../public")
 export const CATEGORY_UPLOAD_DIR = path.join(PUBLIC_DIR, "uploads", "categories")
 export const BANNER_UPLOAD_DIR = path.join(PUBLIC_DIR, "uploads", "banners")
+export const BRAND_UPLOAD_DIR = path.join(PUBLIC_DIR, "uploads", "brands")
 
 fs.mkdirSync(CATEGORY_UPLOAD_DIR, { recursive: true })
 fs.mkdirSync(BANNER_UPLOAD_DIR, { recursive: true })
+fs.mkdirSync(BRAND_UPLOAD_DIR, { recursive: true })
 
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"])
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
@@ -42,6 +44,12 @@ export const categoryImageUpload = multer({
 
 export const bannerImageUpload = multer({
   storage: diskStorageFor(BANNER_UPLOAD_DIR),
+  limits: { fileSize: MAX_FILE_SIZE_BYTES },
+  fileFilter: imageFileFilter,
+})
+
+export const brandImageUpload = multer({
+  storage: diskStorageFor(BRAND_UPLOAD_DIR),
   limits: { fileSize: MAX_FILE_SIZE_BYTES },
   fileFilter: imageFileFilter,
 })

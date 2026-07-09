@@ -1,24 +1,15 @@
+import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
+import { getBrands } from "@/lib/brands"
+import { resolveMediaUrl } from "@/lib/media"
+import type { Brand } from "@/lib/types/brand"
 
-interface Brand {
-  name: string
-  slug: string
-  wordmarkClassName: string
-}
+export async function FeaturedBrands() {
+  const brands = (await getBrands()).filter((brand) => brand.isActive)
 
-const brands: Brand[] = [
-  { name: "SAMSUNG", slug: "samsung", wordmarkClassName: "text-[1.05rem] font-bold tracking-tight" },
-  { name: "sony", slug: "sony", wordmarkClassName: "text-xl font-black italic" },
-  { name: "LG", slug: "lg", wordmarkClassName: "text-2xl font-extrabold text-brand-primary" },
-  { name: "xiaomi", slug: "xiaomi", wordmarkClassName: "text-lg font-bold text-danger" },
-  { name: "Canon", slug: "canon", wordmarkClassName: "text-xl font-serif italic" },
-  { name: "logitech", slug: "logitech", wordmarkClassName: "text-lg font-semibold uppercase tracking-widest" },
-  { name: "JBL", slug: "jbl", wordmarkClassName: "text-2xl font-black" },
-  { name: "HUAWEI", slug: "huawei", wordmarkClassName: "text-base font-bold tracking-wide text-danger" },
-]
+  if (brands.length === 0) return null
 
-export function FeaturedBrands() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-end justify-between gap-4">
@@ -80,6 +71,8 @@ export function FeaturedBrands() {
 }
 
 function BrandTile({ brand, hidden }: { brand: Brand; hidden?: boolean }) {
+  const imageUrl = resolveMediaUrl(brand.image)
+
   return (
     <Link
       href={`/brands/${brand.slug}`}
@@ -88,7 +81,11 @@ function BrandTile({ brand, hidden }: { brand: Brand; hidden?: boolean }) {
       tabIndex={hidden ? -1 : undefined}
       className="flex h-20 w-40 shrink-0 items-center justify-center rounded-xl bg-bg-section px-4 text-text-primary transition-all hover:-translate-y-0.5 hover:bg-surface hover:shadow-e2 sm:w-48"
     >
-      <span className={brand.wordmarkClassName}>{brand.name}</span>
+      {imageUrl ? (
+        <Image src={imageUrl} alt={brand.name} width={128} height={48} className="h-12 w-auto object-contain" />
+      ) : (
+        <span className="text-lg font-bold text-text-primary">{brand.name}</span>
+      )}
     </Link>
   )
 }

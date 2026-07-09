@@ -6,6 +6,7 @@ import { announcementRouter } from "./modules/announcement/announcement.routes.j
 import { categoryRouter } from "./modules/category/category.routes.js"
 import { bannerRouter } from "./modules/banner/banner.routes.js"
 import { flashSaleRouter } from "./modules/flash-sale/flash-sale.routes.js"
+import { brandRouter } from "./modules/brand/brand.routes.js"
 import { errorHandler } from "./shared/middlewares/errorHandler.js"
 import { PUBLIC_DIR } from "./shared/middlewares/upload.js"
 
@@ -28,5 +29,6 @@ app.use("/api/announcements", announcementRouter)
 app.use("/api/categories", categoryRouter)
 app.use("/api/banners", bannerRouter)
 app.use("/api/flash-sales", flashSaleRouter)
+app.use("/api/brands", brandRouter)
 
 app.use(errorHandler)
