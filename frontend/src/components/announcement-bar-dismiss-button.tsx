@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react"
 
-const STORAGE_KEY = "nordvolt-announcement-dismissed"
+const STORAGE_KEY = "electromart-announcement-dismissed"
 
 export function AnnouncementBarDismissButton({ announcementId }: { announcementId: string }) {
   return (
