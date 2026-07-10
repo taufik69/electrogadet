@@ -181,6 +181,45 @@ body {
   font-family: var(--font-sans, "Inter", system-ui, sans-serif);
 }
 
+/* Sidebar brand mark — equalizer bars and drifting gadget glyphs. */
+@keyframes eq-bar {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes glyph-drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--glyph-tilt, 0deg));
+    opacity: 0.18;
+  }
+  50% {
+    transform: translateY(-6px) rotate(var(--glyph-tilt, 0deg));
+    opacity: 0.42;
+  }
+}
+
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq-bar 900ms ease-in-out infinite;
+}
+
+.glyph-drift {
+  animation: glyph-drift 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar,
+  .glyph-drift {
+    animation: none;
+  }
+}
+
 /* Testimonial marquee — the track holds two copies of the list, so shifting
    it exactly -50% lands on the start of the second copy and loops seamlessly. */
 @keyframes marquee-x {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Header } from "@/components/header";
 import { CategorySidebar } from "@/components/category-sidebar";
+import { ChatWidget } from "@/components/chat-widget";
 import { Footer } from "@/components/footer";
 import "./globals.css";
 
@@ -42,6 +43,7 @@ export default function RootLayout({
             <Footer />
           </div>
         </div>
+        <ChatWidget />
       </body>
     </html>
   );

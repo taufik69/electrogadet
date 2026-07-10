@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 import { brands } from "@/lib/data/brands";
 
 export function CategorySidebar() {
@@ -24,21 +25,15 @@ export function CategorySidebar() {
     <div className="relative z-30 hidden w-[314px] shrink-0 border-r border-sidebar-border bg-gradient-to-b from-sidebar-elevated to-sidebar lg:block">
       <div className="sticky top-0 flex h-screen flex-col" onMouseLeave={close}>
         {/* Brand mark — centered at the top of the sidebar column */}
-        <Link
-          href="/"
-          aria-label="ElectroGadget — home"
-          className="flex h-25.5 shrink-0 items-center justify-center gap-2 border-b border-sidebar-border px-5"
-        >
-          <span className="text-h4 font-semibold tracking-tight text-white">
-            ElectroGadget
-          </span>
-        </Link>
+        <BrandMark />
 
-        <div className="flex min-h-0 flex-1">
+        {/* One scroll container for both columns, so the icon rail can never
+            drift out of sync with the brand rows it labels. */}
+        <div className="flex min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {/* Brand logo rail */}
           <div
             aria-hidden
-            className="flex h-full w-16 shrink-0 flex-col items-center overflow-y-auto border-r border-sidebar-border py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex w-16 shrink-0 flex-col items-center border-r border-sidebar-border py-2"
           >
             {/* Spacer matching the nav's "Shop by brand" heading so icons align with rows */}
             <span aria-hidden className="h-9 shrink-0" />
@@ -60,7 +55,7 @@ export function CategorySidebar() {
           {/* Brand names */}
           <nav
             aria-label="Shop by brand"
-            className="flex h-full w-[250px] shrink-0 flex-col overflow-y-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex w-[250px] shrink-0 flex-col py-2"
           >
             <span className="px-5 pt-2 pb-3 text-caption uppercase text-white/40">
               Shop by brand

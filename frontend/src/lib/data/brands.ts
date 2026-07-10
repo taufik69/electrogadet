@@ -8,6 +8,12 @@ import {
   SiJbl,
   SiAsus,
   SiLenovo,
+  SiGoogle,
+  SiLg,
+  SiOneplus,
+  SiHuawei,
+  SiRazer,
+  SiSonos,
 } from "react-icons/si"
 
 export interface BrandProduct {
@@ -269,6 +275,154 @@ export const brands: Brand[] = [
         name: "Lenovo tablets",
         slug: "tablets",
         products: [{ name: "Tab P12 Pro", slug: "tab-p12-pro" }],
+      },
+    ],
+  },
+  {
+    name: "Google products",
+    slug: "google",
+    icon: SiGoogle,
+    categories: [
+      {
+        name: "Google phones",
+        slug: "phones",
+        products: [
+          { name: "Pixel 10 Pro", slug: "pixel-10-pro" },
+          { name: "Pixel 10", slug: "pixel-10" },
+          { name: "Pixel 9a", slug: "pixel-9a" },
+        ],
+      },
+      {
+        name: "Google wearables",
+        slug: "wearables",
+        products: [
+          { name: "Pixel Watch 4", slug: "pixel-watch-4" },
+          { name: "Pixel Buds Pro 2", slug: "pixel-buds-pro-2" },
+        ],
+      },
+      {
+        name: "Google smart home",
+        slug: "smart-home",
+        products: [
+          { name: "Nest Hub Max", slug: "nest-hub-max" },
+          { name: "Nest Thermostat", slug: "nest-thermostat" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "LG products",
+    slug: "lg",
+    icon: SiLg,
+    categories: [
+      {
+        name: "LG monitors",
+        slug: "monitors",
+        products: [
+          { name: "UltraGear OLED 27", slug: "ultragear-oled-27" },
+          { name: "UltraFine 5K", slug: "ultrafine-5k" },
+        ],
+      },
+      {
+        name: "LG televisions",
+        slug: "televisions",
+        products: [
+          { name: "OLED evo C5", slug: "oled-evo-c5" },
+          { name: "OLED evo G5", slug: "oled-evo-g5" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "OnePlus products",
+    slug: "oneplus",
+    icon: SiOneplus,
+    categories: [
+      {
+        name: "OnePlus phones",
+        slug: "phones",
+        products: [
+          { name: "OnePlus 13", slug: "oneplus-13" },
+          { name: "OnePlus 13R", slug: "oneplus-13r" },
+          { name: "OnePlus Nord 5", slug: "oneplus-nord-5" },
+        ],
+      },
+      {
+        name: "OnePlus audio",
+        slug: "audio",
+        products: [{ name: "Buds Pro 3", slug: "buds-pro-3" }],
+      },
+    ],
+  },
+  {
+    name: "Huawei products",
+    slug: "huawei",
+    icon: SiHuawei,
+    categories: [
+      {
+        name: "Huawei wearables",
+        slug: "wearables",
+        products: [
+          { name: "Watch GT 6 Pro", slug: "watch-gt-6-pro" },
+          { name: "Band 10", slug: "band-10" },
+        ],
+      },
+      {
+        name: "Huawei tablets",
+        slug: "tablets",
+        products: [{ name: "MatePad Pro 13.2", slug: "matepad-pro-13-2" }],
+      },
+    ],
+  },
+  {
+    name: "Razer products",
+    slug: "razer",
+    icon: SiRazer,
+    categories: [
+      {
+        name: "Razer keyboards",
+        slug: "keyboards",
+        products: [
+          { name: "BlackWidow V4 Pro", slug: "blackwidow-v4-pro" },
+          { name: "Huntsman V3", slug: "huntsman-v3" },
+        ],
+      },
+      {
+        name: "Razer mice",
+        slug: "mice",
+        products: [
+          { name: "DeathAdder V4 Pro", slug: "deathadder-v4-pro" },
+          { name: "Viper V3 Pro", slug: "viper-v3-pro" },
+        ],
+      },
+      {
+        name: "Razer headsets",
+        slug: "headsets",
+        products: [{ name: "BlackShark V3 Pro", slug: "blackshark-v3-pro" }],
+      },
+    ],
+  },
+  {
+    name: "Sonos products",
+    slug: "sonos",
+    icon: SiSonos,
+    categories: [
+      {
+        name: "Sonos speakers",
+        slug: "speakers",
+        products: [
+          { name: "Era 300", slug: "era-300" },
+          { name: "Move 2", slug: "move-2" },
+          { name: "Roam 2", slug: "roam-2" },
+        ],
+      },
+      {
+        name: "Sonos soundbars",
+        slug: "soundbars",
+        products: [
+          { name: "Arc Ultra", slug: "arc-ultra" },
+          { name: "Beam Gen 2", slug: "beam-gen-2" },
+        ],
       },
     ],
   },
