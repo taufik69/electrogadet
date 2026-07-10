@@ -16,13 +16,13 @@ export function CategoryTiles() {
       <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-5">
         {categoryTiles.map((tile) => (
           <Link key={tile.slug} href={`/products?category=${tile.slug}`} className="group">
-            <span className="flex aspect-4/3 items-center justify-center overflow-hidden rounded-md bg-bg-section">
+            <span className="block aspect-4/3 overflow-hidden rounded-md">
               <Image
                 src={tile.imageUrl}
                 alt=""
                 width={400}
                 height={300}
-                className="size-3/4 object-contain transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+                className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
               />
             </span>
             <span className="mt-3 block text-small-semibold text-text-primary">

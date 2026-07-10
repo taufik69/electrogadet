@@ -22,8 +22,10 @@
   --color-surface: #ffffff;
 
   /* Sidebar — warm dark surface for the brand nav / flyout panels */
-  --color-sidebar: #282828;
-  --color-sidebar-elevated: #333333;
+  --color-sidebar: #202020;
+  --color-sidebar-elevated: #2e2e2e;
+  /* Hairline divider that reads on the dark sidebar surface */
+  --color-sidebar-border: #3a3a3a;
 
   /* Radius */
   --radius-sm: 8px;
@@ -78,6 +80,7 @@
 
   --color-sidebar: var(--color-sidebar);
   --color-sidebar-elevated: var(--color-sidebar-elevated);
+  --color-sidebar-border: var(--color-sidebar-border);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
@@ -176,4 +179,31 @@ body {
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+}
+
+/* Testimonial marquee — the track holds two copies of the list, so shifting
+   it exactly -50% lands on the start of the second copy and loops seamlessly. */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee-x 40s linear infinite;
+  width: max-content;
+}
+
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
 }

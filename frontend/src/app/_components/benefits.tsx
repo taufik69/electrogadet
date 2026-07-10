@@ -7,7 +7,7 @@ export function Benefits() {
       className="w-full px-4 py-16 sm:px-6 lg:px-6"
     >
       <h2 id="benefits-heading" className="mb-8 text-h3 text-text-primary">
-        Why Electromart
+        Why ElectroGadget
       </h2>
 
       <ul className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">

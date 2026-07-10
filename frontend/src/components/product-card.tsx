@@ -1,28 +1,30 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Star } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import Link from "next/link";
+import { Star } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   WishlistButton,
   CompareButton,
   AddToCartButton,
-} from "@/components/product-card-actions"
-import { formatPriceCents } from "@/lib/format"
-import { cn } from "@/lib/utils"
-import type { ProductCardData } from "@/lib/types/product"
+} from "@/components/product-card-actions";
+import { formatPriceCents } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import type { ProductCardData } from "@/lib/types/product";
 
 const BADGE_LABEL: Record<NonNullable<ProductCardData["badge"]>, string> = {
   new: "New",
   bestseller: "Bestseller",
-}
+};
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const discountedCents = product.discountPercent
     ? Math.round(product.priceCents * (1 - product.discountPercent / 100))
-    : null
+    : null;
 
-  const gallery = product.imageUrls?.length ? product.imageUrls : [product.imageUrl]
+  const gallery = product.imageUrls?.length
+    ? product.imageUrls
+    : [product.imageUrl];
 
   return (
     <article className="group flex h-full flex-col rounded-md border border-transparent bg-surface p-4 transition-colors duration-200 hover:border-border">
@@ -30,25 +32,25 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       <div className="relative">
         <Link
           href={`/products/${product.slug}`}
-          className="flex aspect-square items-center justify-center overflow-hidden rounded-sm bg-bg-section"
+          className="block aspect-square overflow-hidden rounded-md"
         >
           <Image
             src={product.imageUrl}
             alt={product.name}
             width={320}
             height={320}
-            className="size-3/4 object-contain transition-transform duration-300 ease-out group-hover:scale-[1.03]"
+            className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.03]"
           />
         </Link>
 
         {(product.badge || product.discountPercent) && (
-          <div className="absolute top-0 left-0 flex flex-col gap-1.5">
+          <div className="absolute top-3 left-3 flex items-center gap-1.5">
             {product.badge && (
               <Badge
                 variant={product.badge === "new" ? "outline" : "default"}
                 className={cn(
                   "border-none",
-                  product.badge === "new" && "bg-accent-subtle text-accent"
+                  product.badge === "new" && "bg-accent-subtle text-accent",
                 )}
               >
                 {BADGE_LABEL[product.badge]}
@@ -62,7 +64,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </div>
         )}
 
-        <div className="absolute top-0 right-0 flex flex-col gap-1">
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5">
           <WishlistButton productName={product.name} />
           <CompareButton productName={product.name} />
         </div>
@@ -76,7 +78,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               key={src}
               className={cn(
                 "size-1.5 rounded-full",
-                index === 0 ? "bg-brand-primary" : "bg-border"
+                index === 0 ? "bg-brand-primary" : "bg-border",
               )}
             />
           ))}
@@ -116,7 +118,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             <span
               className={cn(
                 "text-caption",
-                product.inStock ? "text-success" : "text-text-secondary"
+                product.inStock ? "text-success" : "text-text-secondary",
               )}
             >
               {product.inStock ? "In stock" : "Out of stock"}
@@ -133,5 +135,5 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         </div>
       </div>
     </article>
-  )
+  );
 }

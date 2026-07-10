@@ -27,4 +27,11 @@ export const testimonials: Testimonial[] = [
       "Customer support helped me pick the right model in minutes. No pressure, just genuinely useful advice.",
     rating: 4,
   },
+  {
+    name: "Mateo Rivera",
+    role: "Verified buyer",
+    quote:
+      "Ordered on a Friday night and it arrived Saturday morning. The trade-in credit was applied without me having to chase anyone.",
+    rating: 5,
+  },
 ]

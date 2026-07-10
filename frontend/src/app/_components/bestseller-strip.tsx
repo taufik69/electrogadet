@@ -13,7 +13,7 @@ export function BestsellerStrip({ products }: BestsellerStripProps) {
   return (
     <section
       aria-labelledby="bestseller-strip-heading"
-      className="w-full px-4 py-12 sm:px-6 lg:px-6"
+      className="w-full px-4 py-12 sm:px-6"
     >
       <div className="mb-8 flex items-end justify-between gap-4">
         <h2 id="bestseller-strip-heading" className="text-h3 text-text-primary">
@@ -27,24 +27,20 @@ export function BestsellerStrip({ products }: BestsellerStripProps) {
         </Link>
       </div>
 
-      <ol className="grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2 lg:grid-cols-4">
-        {products.map((product, index) => (
-          <li key={product.id}>
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {products.map((product) => (
+          <li key={product.id} className="flex">
             <Link
               href={`/products/${product.slug}`}
-              className="group flex items-center gap-4 rounded-md py-3 transition-colors duration-200 hover:bg-bg-section"
+              className="group flex flex-1 items-center gap-4 rounded-md bg-bg-section p-4 transition-shadow duration-200 hover:shadow-e1"
             >
-              <span className="w-5 shrink-0 text-center text-caption text-text-secondary">
-                {index + 1}
-              </span>
-
-              <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-bg-section">
+              <span className="block size-14 shrink-0 overflow-hidden rounded-md">
                 <Image
                   src={product.imageUrl}
                   alt=""
                   width={56}
                   height={56}
-                  className="size-3/4 object-contain transition-transform duration-300 ease-out group-hover:scale-105"
+                  className="size-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
                 />
               </span>
 
@@ -59,7 +55,7 @@ export function BestsellerStrip({ products }: BestsellerStripProps) {
             </Link>
           </li>
         ))}
-      </ol>
+      </ul>
     </section>
   )
 }

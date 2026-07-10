@@ -39,14 +39,14 @@ export function Header() {
       <div className="flex h-16 w-full items-center gap-4 px-4 sm:px-6 lg:gap-8 lg:px-6">
         <Link
           href="/"
-          aria-label="Electromart — home"
+          aria-label="ElectroGadget — home"
           className="flex shrink-0 items-center gap-2 lg:hidden"
         >
           <span className="flex size-8 items-center justify-center rounded-md bg-brand-primary">
             <Zap className="size-4 fill-white text-white" />
           </span>
           <span className="text-h4 font-semibold tracking-tight text-text-primary">
-            Electromart
+            ElectroGadget
           </span>
         </Link>
 

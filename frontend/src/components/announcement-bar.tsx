@@ -40,7 +40,7 @@ export async function AnnouncementBar() {
         // Hides the bar before paint if the visitor already dismissed this exact announcement,
         // avoiding a flash of a bar that's about to be removed on mount.
         dangerouslySetInnerHTML={{
-          __html: `(function(){var b=document.getElementById("announcement-bar");if(b&&localStorage.getItem("electromart-announcement-dismissed")===b.dataset.announcementId){b.remove()}})()`,
+          __html: `(function(){var b=document.getElementById("announcement-bar");if(b&&localStorage.getItem("electrogadget-announcement-dismissed")===b.dataset.announcementId){b.remove()}})()`,
         }}
       />
       <div

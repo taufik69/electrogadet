@@ -29,7 +29,7 @@ export function PromoCarousel() {
             key={slide.title}
             href={slide.href}
             data-promo-card
-            className="group relative flex aspect-[4/3] w-full shrink-0 snap-start flex-col justify-end overflow-hidden bg-bg-section transition-opacity duration-250 ease-out hover:opacity-95 sm:w-[calc(50%-2px)]"
+            className="group relative flex aspect-[4/3] w-full shrink-0 snap-start flex-col justify-end overflow-hidden rounded-lg bg-bg-section transition-opacity duration-250 ease-out hover:opacity-95 sm:w-[calc(50%-2px)]"
           >
             <Image
               src={slide.imageUrl}

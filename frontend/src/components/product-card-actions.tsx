@@ -19,7 +19,7 @@ export function WishlistButton({ productName }: { productName: string }) {
         e.preventDefault()
         setWished((prev) => !prev)
       }}
-      className="size-8 rounded-full hover:bg-bg-section"
+      className="size-8 rounded-full bg-surface/85 shadow-e1 backdrop-blur-sm hover:bg-surface"
     >
       <Heart
         className={cn(
@@ -45,7 +45,7 @@ export function CompareButton({ productName }: { productName: string }) {
         e.preventDefault()
         setCompared((prev) => !prev)
       }}
-      className="size-8 rounded-full hover:bg-bg-section"
+      className="size-8 rounded-full bg-surface/85 shadow-e1 backdrop-blur-sm hover:bg-surface"
     >
       <BarChart2
         className={cn(

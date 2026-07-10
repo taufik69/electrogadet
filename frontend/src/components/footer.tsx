@@ -1,5 +1,7 @@
 import Link from "next/link"
-import { Phone, MapPin, Star } from "lucide-react"
+import { Zap } from "lucide-react"
+// lucide-react has no brand marks (trademarks); Simple Icons does.
+import { SiFacebook, SiInstagram, SiYoutube } from "react-icons/si"
 
 const FOOTER_COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
   {
@@ -33,9 +35,10 @@ const FOOTER_COLUMNS: { title: string; links: { label: string; href: string }[] 
   },
 ]
 
-const REVIEW_SCORES = [
-  { source: "Yandex", score: "4.8" },
-  { source: "Google", score: "4.9" },
+const SOCIALS = [
+  { label: "Facebook", href: "https://facebook.com", icon: SiFacebook },
+  { label: "Instagram", href: "https://instagram.com", icon: SiInstagram },
+  { label: "YouTube", href: "https://youtube.com", icon: SiYoutube },
 ]
 
 export function Footer() {
@@ -43,44 +46,39 @@ export function Footer() {
 
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="w-full px-4 py-16 sm:px-6 lg:px-6">
-        {/* Contact + reviews */}
-        <div className="flex flex-col justify-between gap-8 border-b border-border pb-10 lg:flex-row lg:items-start">
-          <div className="flex flex-col gap-3">
-            <a
-              href="tel:+18005551234"
-              className="flex items-center gap-2 text-h3 text-text-primary transition-colors duration-200 hover:text-brand-primary"
-            >
-              <Phone className="size-5 text-text-secondary" />
-              +1 (800) 555-1234
-            </a>
-            <p className="flex items-center gap-2 text-small text-text-secondary">
-              <MapPin className="size-4 shrink-0" />
-              128 Harbour Street, Oslo, Norway
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <span className="text-small-semibold text-text-primary">Customer rating</span>
-            <div className="flex items-center gap-6">
-              {REVIEW_SCORES.map((review) => (
-                <span key={review.source} className="flex items-center gap-1.5">
-                  <Star className="size-4 fill-warning text-warning" />
-                  <span className="text-small-semibold text-text-primary">{review.score}</span>
-                  <span className="text-small text-text-secondary">{review.source}</span>
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Link columns */}
-        <div className="grid grid-cols-2 gap-8 py-10 sm:grid-cols-4">
-          <div className="col-span-2 sm:col-span-1">
-            <span className="text-h4 font-semibold text-text-primary">Electromart</span>
-            <p className="mt-3 text-small text-text-secondary">
+      {/* Matches <main>'s lg:px-6 plus each section's own px-4/sm:px-6, so the
+          footer's columns line up with the content above it. */}
+      <div className="w-full px-4 py-16 sm:px-6 lg:px-12">
+        {/* Brand + link columns */}
+        <div className="grid grid-cols-2 gap-8 pb-10 sm:grid-cols-4">
+          <div className="col-span-2 flex flex-col gap-4 sm:col-span-1">
+            <span className="flex items-center gap-2">
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-brand-primary">
+                <Zap className="size-4 fill-white text-white" />
+              </span>
+              <span className="text-h4 font-semibold text-text-primary">ElectroGadget</span>
+            </span>
+            <p className="text-small text-text-secondary">
               Premium electronics, thoughtfully curated.
             </p>
+
+            <div className="flex items-center gap-2">
+              {SOCIALS.map((social) => {
+                const Icon = social.icon
+                return (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    aria-label={social.label}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex size-9 items-center justify-center rounded-full bg-bg-section text-text-secondary transition-colors duration-200 hover:bg-brand-subtle hover:text-brand-primary"
+                  >
+                    <Icon className="size-4" />
+                  </a>
+                )
+              })}
+            </div>
           </div>
 
           {FOOTER_COLUMNS.map((column) => (
@@ -104,13 +102,19 @@ export function Footer() {
 
         <div className="flex flex-col-reverse items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-caption text-text-secondary">
-            &copy; {year} Electromart. All rights reserved.
+            &copy; {year} ElectroGadget. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <Link href="/legal/privacy" className="text-caption text-text-secondary hover:text-text-primary">
+            <Link
+              href="/legal/privacy"
+              className="text-caption text-text-secondary hover:text-text-primary"
+            >
               Privacy
             </Link>
-            <Link href="/legal/terms" className="text-caption text-text-secondary hover:text-text-primary">
+            <Link
+              href="/legal/terms"
+              className="text-caption text-text-secondary hover:text-text-primary"
+            >
               Terms
             </Link>
           </div>

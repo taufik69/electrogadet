@@ -21,7 +21,7 @@ export function HeaderSearch() {
       role="search"
       className="hidden flex-1 items-center sm:flex"
     >
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-2xl">
         <Input
           name="q"
           type="search"

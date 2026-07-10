@@ -6,7 +6,7 @@ import { Benefits } from "@/app/_components/benefits"
 import { Articles } from "@/app/_components/articles"
 import { FootPromos } from "@/app/_components/foot-promos"
 import { Testimonials } from "@/app/_components/testimonials"
-import { Newsletter } from "@/app/_components/newsletter"
+import { Faq } from "@/app/_components/faq"
 import { fetchProducts } from "@/lib/products"
 import { toProductCardDataList } from "@/lib/data/product-display"
 
@@ -56,7 +56,7 @@ export default async function Home() {
       <FootPromos />
 
       <Testimonials />
-      <Newsletter />
+      <Faq />
     </>
   )
 }

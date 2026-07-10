@@ -12,15 +12,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Electromart — Premium Electronics",
-    template: "%s | Electromart",
+    default: "ElectroGadget — Premium Electronics",
+    template: "%s | ElectroGadget",
   },
   description:
-    "Electromart is a premium electronics storefront — thoughtfully curated audio, wearables, and accessories.",
+    "ElectroGadget is a premium electronics storefront — thoughtfully curated audio, wearables, and accessories.",
   openGraph: {
-    title: "Electromart — Premium Electronics",
+    title: "ElectroGadget — Premium Electronics",
     description:
-      "Electromart is a premium electronics storefront — thoughtfully curated audio, wearables, and accessories.",
+      "ElectroGadget is a premium electronics storefront — thoughtfully curated audio, wearables, and accessories.",
     type: "website",
   },
 };
@@ -33,15 +33,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-bg-primary">
-        <div className="flex flex-1 items-start">
+        <div className="flex flex-1 items-stretch">
           <CategorySidebar />
 
-          <div className="flex min-w-0 flex-1 flex-col py-5 ">
+          <div className="flex min-w-0 flex-1 flex-col">
             <Header />
-            <main className="min-w-0 flex-1 lg:pl-6">{children}</main>
+            <main className="min-w-0 flex-1 lg:pr-6 lg:pl-6">{children}</main>
+            <Footer />
           </div>
         </div>
-        <Footer />
       </body>
     </html>
   );
