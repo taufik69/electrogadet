@@ -1,0 +1,781 @@
+[
+  {
+    "name": "Apple products",
+    "slug": "apple",
+    "iconKey": "SiApple",
+    "sortOrder": 0,
+    "categories": [
+      {
+        "name": "Apple iPad",
+        "slug": "ipad",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "iPad Pro 13\" M5 (2025)",
+            "slug": "ipad-pro-13-m5-2025",
+            "sortOrder": 0
+          },
+          {
+            "name": "iPad Air 11\" (2025)",
+            "slug": "ipad-air-11-2025",
+            "sortOrder": 1
+          },
+          {
+            "name": "iPad Air 13\" (2025)",
+            "slug": "ipad-air-13-2025",
+            "sortOrder": 2
+          },
+          {
+            "name": "iPad mini (2024)",
+            "slug": "ipad-mini-2024",
+            "sortOrder": 3
+          }
+        ]
+      },
+      {
+        "name": "Apple MacBook",
+        "slug": "macbook",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "MacBook Pro 14\" M5",
+            "slug": "macbook-pro-14-m5",
+            "sortOrder": 0
+          },
+          {
+            "name": "MacBook Pro 16\" M5",
+            "slug": "macbook-pro-16-m5",
+            "sortOrder": 1
+          },
+          {
+            "name": "MacBook Air 13\" M4",
+            "slug": "macbook-air-13-m4",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "Apple Watch",
+        "slug": "watch",
+        "sortOrder": 2,
+        "products": [
+          {
+            "name": "Apple Watch Series 11",
+            "slug": "watch-series-11",
+            "sortOrder": 0
+          },
+          {
+            "name": "Apple Watch Ultra 3",
+            "slug": "watch-ultra-3",
+            "sortOrder": 1
+          },
+          {
+            "name": "Apple Watch SE",
+            "slug": "watch-se",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "Apple iPhone",
+        "slug": "iphone",
+        "sortOrder": 3,
+        "products": [
+          {
+            "name": "iPhone 17 Pro Max",
+            "slug": "iphone-17-pro-max",
+            "sortOrder": 0
+          },
+          {
+            "name": "iPhone 17 Pro",
+            "slug": "iphone-17-pro",
+            "sortOrder": 1
+          },
+          {
+            "name": "iPhone 17",
+            "slug": "iphone-17",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "Apple accessories",
+        "slug": "accessories",
+        "sortOrder": 4,
+        "products": [
+          {
+            "name": "AirPods Pro 3",
+            "slug": "airpods-pro-3",
+            "sortOrder": 0
+          },
+          {
+            "name": "Magic Keyboard",
+            "slug": "magic-keyboard",
+            "sortOrder": 1
+          },
+          {
+            "name": "Apple Pencil Pro",
+            "slug": "apple-pencil-pro",
+            "sortOrder": 2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Samsung products",
+    "slug": "samsung",
+    "iconKey": "SiSamsung",
+    "sortOrder": 1,
+    "categories": [
+      {
+        "name": "Samsung tablets",
+        "slug": "tablets",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "Galaxy Tab S11",
+            "slug": "galaxy-tab-s11",
+            "sortOrder": 0
+          },
+          {
+            "name": "Galaxy Tab S10 Ultra",
+            "slug": "galaxy-tab-s10-ultra",
+            "sortOrder": 1
+          },
+          {
+            "name": "Galaxy Tab S10+",
+            "slug": "galaxy-tab-s10-plus",
+            "sortOrder": 2
+          },
+          {
+            "name": "Galaxy Tab A9+",
+            "slug": "galaxy-tab-a9-plus",
+            "sortOrder": 3
+          }
+        ]
+      },
+      {
+        "name": "Samsung phones",
+        "slug": "phones",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "Galaxy S25 Ultra",
+            "slug": "galaxy-s25-ultra",
+            "sortOrder": 0
+          },
+          {
+            "name": "Galaxy S25+",
+            "slug": "galaxy-s25-plus",
+            "sortOrder": 1
+          },
+          {
+            "name": "Galaxy Z Fold 7",
+            "slug": "galaxy-z-fold-7",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "Samsung watches",
+        "slug": "watches",
+        "sortOrder": 2,
+        "products": [
+          {
+            "name": "Galaxy Watch 8",
+            "slug": "galaxy-watch-8",
+            "sortOrder": 0
+          },
+          {
+            "name": "Galaxy Watch Ultra",
+            "slug": "galaxy-watch-ultra",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Samsung headphones",
+        "slug": "headphones",
+        "sortOrder": 3,
+        "products": [
+          {
+            "name": "Galaxy Buds 4 Pro",
+            "slug": "galaxy-buds-4-pro",
+            "sortOrder": 0
+          },
+          {
+            "name": "Galaxy Buds 4",
+            "slug": "galaxy-buds-4",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Sony products",
+    "slug": "sony",
+    "iconKey": "SiSony",
+    "sortOrder": 2,
+    "categories": [
+      {
+        "name": "Sony headphones",
+        "slug": "headphones",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "WH-1000XM6",
+            "slug": "wh-1000xm6",
+            "sortOrder": 0
+          },
+          {
+            "name": "WF-1000XM5",
+            "slug": "wf-1000xm5",
+            "sortOrder": 1
+          },
+          {
+            "name": "ULT Wear",
+            "slug": "ult-wear",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "Sony cameras",
+        "slug": "cameras",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "Alpha 7 V",
+            "slug": "alpha-7-v",
+            "sortOrder": 0
+          },
+          {
+            "name": "Alpha 6700",
+            "slug": "alpha-6700",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Xiaomi products",
+    "slug": "xiaomi",
+    "iconKey": "SiXiaomi",
+    "sortOrder": 3,
+    "categories": [
+      {
+        "name": "Xiaomi phones",
+        "slug": "phones",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "Xiaomi 15 Ultra",
+            "slug": "xiaomi-15-ultra",
+            "sortOrder": 0
+          },
+          {
+            "name": "Redmi Note 14 Pro",
+            "slug": "redmi-note-14-pro",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Xiaomi vacuums",
+        "slug": "vacuums",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "Robot Vacuum X20",
+            "slug": "robot-vacuum-x20",
+            "sortOrder": 0
+          },
+          {
+            "name": "Vacuum G11",
+            "slug": "vacuum-g11",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Xiaomi wearables",
+        "slug": "wearables",
+        "sortOrder": 2,
+        "products": [
+          {
+            "name": "Smart Band 10",
+            "slug": "smart-band-10",
+            "sortOrder": 0
+          },
+          {
+            "name": "Watch S4",
+            "slug": "watch-s4",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Bose products",
+    "slug": "bose",
+    "iconKey": "SiBose",
+    "sortOrder": 4,
+    "categories": [
+      {
+        "name": "Bose headphones",
+        "slug": "headphones",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "QuietComfort Ultra",
+            "slug": "quietcomfort-ultra",
+            "sortOrder": 0
+          },
+          {
+            "name": "QuietComfort Earbuds",
+            "slug": "quietcomfort-earbuds",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Bose speakers",
+        "slug": "speakers",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "SoundLink Max",
+            "slug": "soundlink-max",
+            "sortOrder": 0
+          },
+          {
+            "name": "Home Speaker 500",
+            "slug": "home-speaker-500",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "JBL products",
+    "slug": "jbl",
+    "iconKey": "SiJbl",
+    "sortOrder": 5,
+    "categories": [
+      {
+        "name": "JBL speakers",
+        "slug": "speakers",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "Charge 6",
+            "slug": "charge-6",
+            "sortOrder": 0
+          },
+          {
+            "name": "Flip 7",
+            "slug": "flip-7",
+            "sortOrder": 1
+          },
+          {
+            "name": "Boombox 4",
+            "slug": "boombox-4",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "JBL headphones",
+        "slug": "headphones",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "Tour One M3",
+            "slug": "tour-one-m3",
+            "sortOrder": 0
+          },
+          {
+            "name": "Live 770NC",
+            "slug": "live-770nc",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Asus products",
+    "slug": "asus",
+    "iconKey": "SiAsus",
+    "sortOrder": 6,
+    "categories": [
+      {
+        "name": "Asus laptops",
+        "slug": "laptops",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "ROG Zephyrus G16",
+            "slug": "rog-zephyrus-g16",
+            "sortOrder": 0
+          },
+          {
+            "name": "Zenbook 14 OLED",
+            "slug": "zenbook-14-oled",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Asus monitors",
+        "slug": "monitors",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "ProArt PA32UCE",
+            "slug": "proart-pa32uce",
+            "sortOrder": 0
+          },
+          {
+            "name": "ROG Swift OLED",
+            "slug": "rog-swift-oled",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Lenovo products",
+    "slug": "lenovo",
+    "iconKey": "SiLenovo",
+    "sortOrder": 7,
+    "categories": [
+      {
+        "name": "Lenovo laptops",
+        "slug": "laptops",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "ThinkPad X1 Carbon",
+            "slug": "thinkpad-x1-carbon",
+            "sortOrder": 0
+          },
+          {
+            "name": "Yoga Slim 7i",
+            "slug": "yoga-slim-7i",
+            "sortOrder": 1
+          },
+          {
+            "name": "Legion Pro 7i",
+            "slug": "legion-pro-7i",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "Lenovo tablets",
+        "slug": "tablets",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "Tab P12 Pro",
+            "slug": "tab-p12-pro",
+            "sortOrder": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Google products",
+    "slug": "google",
+    "iconKey": "SiGoogle",
+    "sortOrder": 8,
+    "categories": [
+      {
+        "name": "Google phones",
+        "slug": "phones",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "Pixel 10 Pro",
+            "slug": "pixel-10-pro",
+            "sortOrder": 0
+          },
+          {
+            "name": "Pixel 10",
+            "slug": "pixel-10",
+            "sortOrder": 1
+          },
+          {
+            "name": "Pixel 9a",
+            "slug": "pixel-9a",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "Google wearables",
+        "slug": "wearables",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "Pixel Watch 4",
+            "slug": "pixel-watch-4",
+            "sortOrder": 0
+          },
+          {
+            "name": "Pixel Buds Pro 2",
+            "slug": "pixel-buds-pro-2",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Google smart home",
+        "slug": "smart-home",
+        "sortOrder": 2,
+        "products": [
+          {
+            "name": "Nest Hub Max",
+            "slug": "nest-hub-max",
+            "sortOrder": 0
+          },
+          {
+            "name": "Nest Thermostat",
+            "slug": "nest-thermostat",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "LG products",
+    "slug": "lg",
+    "iconKey": "SiLg",
+    "sortOrder": 9,
+    "categories": [
+      {
+        "name": "LG monitors",
+        "slug": "monitors",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "UltraGear OLED 27",
+            "slug": "ultragear-oled-27",
+            "sortOrder": 0
+          },
+          {
+            "name": "UltraFine 5K",
+            "slug": "ultrafine-5k",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "LG televisions",
+        "slug": "televisions",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "OLED evo C5",
+            "slug": "oled-evo-c5",
+            "sortOrder": 0
+          },
+          {
+            "name": "OLED evo G5",
+            "slug": "oled-evo-g5",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "OnePlus products",
+    "slug": "oneplus",
+    "iconKey": "SiOneplus",
+    "sortOrder": 10,
+    "categories": [
+      {
+        "name": "OnePlus phones",
+        "slug": "phones",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "OnePlus 13",
+            "slug": "oneplus-13",
+            "sortOrder": 0
+          },
+          {
+            "name": "OnePlus 13R",
+            "slug": "oneplus-13r",
+            "sortOrder": 1
+          },
+          {
+            "name": "OnePlus Nord 5",
+            "slug": "oneplus-nord-5",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "OnePlus audio",
+        "slug": "audio",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "Buds Pro 3",
+            "slug": "buds-pro-3",
+            "sortOrder": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Huawei products",
+    "slug": "huawei",
+    "iconKey": "SiHuawei",
+    "sortOrder": 11,
+    "categories": [
+      {
+        "name": "Huawei wearables",
+        "slug": "wearables",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "Watch GT 6 Pro",
+            "slug": "watch-gt-6-pro",
+            "sortOrder": 0
+          },
+          {
+            "name": "Band 10",
+            "slug": "band-10",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Huawei tablets",
+        "slug": "tablets",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "MatePad Pro 13.2",
+            "slug": "matepad-pro-13-2",
+            "sortOrder": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Razer products",
+    "slug": "razer",
+    "iconKey": "SiRazer",
+    "sortOrder": 12,
+    "categories": [
+      {
+        "name": "Razer keyboards",
+        "slug": "keyboards",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "BlackWidow V4 Pro",
+            "slug": "blackwidow-v4-pro",
+            "sortOrder": 0
+          },
+          {
+            "name": "Huntsman V3",
+            "slug": "huntsman-v3",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Razer mice",
+        "slug": "mice",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "DeathAdder V4 Pro",
+            "slug": "deathadder-v4-pro",
+            "sortOrder": 0
+          },
+          {
+            "name": "Viper V3 Pro",
+            "slug": "viper-v3-pro",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Razer headsets",
+        "slug": "headsets",
+        "sortOrder": 2,
+        "products": [
+          {
+            "name": "BlackShark V3 Pro",
+            "slug": "blackshark-v3-pro",
+            "sortOrder": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Sonos products",
+    "slug": "sonos",
+    "iconKey": "SiSonos",
+    "sortOrder": 13,
+    "categories": [
+      {
+        "name": "Sonos speakers",
+        "slug": "speakers",
+        "sortOrder": 0,
+        "products": [
+          {
+            "name": "Era 300",
+            "slug": "era-300",
+            "sortOrder": 0
+          },
+          {
+            "name": "Move 2",
+            "slug": "move-2",
+            "sortOrder": 1
+          },
+          {
+            "name": "Roam 2",
+            "slug": "roam-2",
+            "sortOrder": 2
+          }
+        ]
+      },
+      {
+        "name": "Sonos soundbars",
+        "slug": "soundbars",
+        "sortOrder": 1,
+        "products": [
+          {
+            "name": "Arc Ultra",
+            "slug": "arc-ultra",
+            "sortOrder": 0
+          },
+          {
+            "name": "Beam Gen 2",
+            "slug": "beam-gen-2",
+            "sortOrder": 1
+          }
+        ]
+      }
+    ]
+  }
+]

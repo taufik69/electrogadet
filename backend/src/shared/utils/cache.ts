@@ -16,6 +16,16 @@ export async function bumpCacheVersion(namespace: string): Promise<void> {
   await redis.incr(VERSION_KEY_PREFIX + namespace)
 }
 
+/**
+ * Bumps several namespaces at once. Use this whenever a mutation touches more
+ * than one namespace's cached reads — e.g. any Brand/Category/Product/
+ * ProductCategory write must also invalidate "navigation" (see
+ * backend/.claude/spec/navigation/navigation.spec.md §3.2 and §7).
+ */
+export async function bumpCacheVersions(...namespaces: string[]): Promise<void> {
+  await Promise.all(namespaces.map((namespace) => bumpCacheVersion(namespace)))
+}
+
 async function buildKey(namespace: string, key: string): Promise<string> {
   const version = await getVersion(namespace)
   return `cache:${namespace}:v${version}:${key}`
