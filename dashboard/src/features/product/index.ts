@@ -1,0 +1,6 @@
+export { ProductsPage } from "./pages/ProductsPage"
+export { CreateProductPage } from "./pages/CreateProductPage"
+export { EditProductPage } from "./pages/EditProductPage"
+export { ViewProductPage } from "./pages/ViewProductPage"
+export { useProducts, useProduct } from "./hooks/useProducts"
+export type { Product } from "./types/product.types"

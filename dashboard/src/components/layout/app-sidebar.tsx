@@ -19,11 +19,18 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-const navMain = [{ title: "Products", url: "/products", icon: Package }]
-
-// Both entries follow the same "create first, then list" order (confirmed
+// All entries follow the same "create first, then list" order (confirmed
 // convention — see brand's collapsible nav).
 const collapsibleNav = [
+  {
+    title: "Products",
+    icon: Package,
+    basePath: "/products",
+    items: [
+      { title: "Create Product", url: "/products/new", icon: Plus },
+      { title: "Product List", url: "/products", icon: List },
+    ],
+  },
   {
     title: "Brand",
     icon: Tags,
@@ -76,17 +83,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupLabel className="tracking-wide uppercase">Menu</SidebarGroupLabel>
           <SidebarMenu>
-            {navMain.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild isActive={location.pathname.startsWith(item.url)} tooltip={item.title}>
-                  <Link to={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-
             {collapsibleNav.map((section) => {
               const isSectionActive = location.pathname.startsWith(section.basePath)
               return (

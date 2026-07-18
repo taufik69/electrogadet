@@ -19,7 +19,17 @@ export const productRepository = {
   },
 
   async findById(id: string) {
-    return prisma.product.findUnique({ where: { id }, include: { seo: true } })
+    return prisma.product.findUnique({
+      where: { id },
+      include: {
+        seo: true,
+        // Dashboard's edit/view forms need to know which category(ies) a
+        // product is already attached to, and there's no reverse
+        // lookup-by-productId elsewhere — this is the one place it's cheap
+        // to include since the row is already being fetched by id.
+        categories: { include: { category: true }, orderBy: { sortOrder: "asc" } },
+      },
+    })
   },
 
   async findBySlug(slug: string) {

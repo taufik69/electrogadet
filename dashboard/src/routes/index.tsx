@@ -4,7 +4,10 @@ import { Navigate, Route, Routes } from "react-router"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { Skeleton } from "@/components/ui/skeleton"
 
-const ProductsPage = lazy(() => import("@/pages/Products").then((m) => ({ default: m.ProductsPage })))
+const ProductsPage = lazy(() => import("@/features/product").then((m) => ({ default: m.ProductsPage })))
+const CreateProductPage = lazy(() => import("@/features/product").then((m) => ({ default: m.CreateProductPage })))
+const EditProductPage = lazy(() => import("@/features/product").then((m) => ({ default: m.EditProductPage })))
+const ViewProductPage = lazy(() => import("@/features/product").then((m) => ({ default: m.ViewProductPage })))
 
 const BrandsPage = lazy(() => import("@/features/brand").then((m) => ({ default: m.BrandsPage })))
 const CreateBrandPage = lazy(() => import("@/features/brand").then((m) => ({ default: m.CreateBrandPage })))
@@ -33,6 +36,9 @@ export function AppRoutes() {
           <Route index element={<Navigate to="/brands" replace />} />
 
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/new" element={<CreateProductPage />} />
+          <Route path="/products/:id" element={<ViewProductPage />} />
+          <Route path="/products/:id/edit" element={<EditProductPage />} />
 
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/brands/new" element={<CreateBrandPage />} />
