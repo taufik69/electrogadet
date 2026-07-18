@@ -1,6 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Plus, X } from "lucide-react"
+import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+
+import { cn } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,50 +17,71 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { BRAND_ICON_KEYS } from "../types/brand.types"
-import { resolveBrandIcon } from "../utils/brand-icons"
+import { Textarea } from "@/components/ui/textarea"
 import type { Brand, CreateBrandInput, UpdateBrandInput } from "../types/brand.types"
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-
-// slug is required only on create — the backend rejects it on update (spec
-// §9.4: slug is immutable once created, part of the sidebar URL contract).
-const createSchema = z.object({
+const schema = z.object({
   name: z.string().min(1, "Name is required"),
-  slug: z.string().regex(slugPattern, "Lowercase letters, numbers, and hyphens only"),
-  iconKey: z.string().optional(),
+  description: z.string().optional(),
   isActive: z.boolean(),
 })
 
-type FormValues = z.infer<typeof createSchema>
+type FormValues = z.infer<typeof schema>
 
 interface BrandFormProps {
   brand?: Brand
   isPending: boolean
-  onSubmit: (input: CreateBrandInput | UpdateBrandInput) => void
+  /** File is handled separately from the JSON fields — see CreateBrandPage/EditBrandPage: the brand must exist before an image can be uploaded for it. */
+  onSubmit: (input: CreateBrandInput | UpdateBrandInput, imageFile: File | null) => void
   onCancel: () => void
   submitLabel: string
 }
 
 export function BrandForm({ brand, isPending, onSubmit, onCancel, submitLabel }: BrandFormProps) {
   const isEditing = !!brand
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null)
+  const [isDragOver, setIsDragOver] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(createSchema),
+    resolver: zodResolver(schema),
     defaultValues: brand
-      ? { name: brand.name, slug: brand.slug, iconKey: brand.iconKey ?? undefined, isActive: brand.isActive }
-      : { name: "", slug: "", iconKey: undefined, isActive: true },
+      ? { name: brand.name, description: brand.description ?? "", isActive: brand.isActive }
+      : { name: "", description: "", isActive: true },
   })
 
-  function handleSubmit(values: FormValues) {
-    if (isEditing) {
-      onSubmit({ name: values.name, iconKey: values.iconKey, isActive: values.isActive })
-    } else {
-      onSubmit(values)
-    }
+  function setFile(file: File | null) {
+    setImageFile(file)
+    setImagePreviewUrl((previous) => {
+      if (previous) URL.revokeObjectURL(previous)
+      return file ? URL.createObjectURL(file) : null
+    })
   }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setFile(e.target.files?.[0] ?? null)
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault()
+    setIsDragOver(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file?.type.startsWith("image/")) setFile(file)
+  }
+
+  function clearFile(e: React.MouseEvent) {
+    e.stopPropagation()
+    setFile(null)
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }
+
+  function handleSubmit(values: FormValues) {
+    onSubmit({ name: values.name, description: values.description || undefined, isActive: values.isActive }, imageFile)
+  }
+
+  const currentImageUrl = imagePreviewUrl ?? brand?.imageUrl ?? null
 
   return (
     <Form {...form}>
@@ -70,63 +95,94 @@ export function BrandForm({ brand, isPending, onSubmit, onCancel, submitLabel }:
               <FormControl>
                 <Input placeholder="Apple products" {...field} />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="slug"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Slug</FormLabel>
-              <FormControl>
-                <Input placeholder="apple" disabled={isEditing} {...field} />
-              </FormControl>
-              {isEditing && (
-                <FormDescription>
-                  Slug can&apos;t be changed after creation — it&apos;s part of the storefront URL.
-                </FormDescription>
-              )}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="iconKey"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Icon</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an icon" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {BRAND_ICON_KEYS.map((key) => {
-                    const Icon = resolveBrandIcon(key)
-                    return (
-                      <SelectItem key={key} value={key}>
-                        <span className="flex items-center gap-2">
-                          {Icon && <Icon className="size-4" />}
-                          {key}
-                        </span>
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
               <FormDescription>
-                Only these brand marks are wired up on the storefront — an unlisted icon can&apos;t render there.
+                The storefront slug and URL are generated from this automatically.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Premium electronics from Apple." rows={3} {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="space-y-2">
+          {/* Not a FormField — imageFile/imagePreviewUrl are plain useState, not
+              react-hook-form fields, so shadcn's FormLabel (which requires a
+              useFormField context from an enclosing FormField) doesn't apply
+              here. A plain <label> avoids the "useFormField should be used
+              within <FormField>" crash. */}
+          <label className="text-sm font-medium leading-none">Brand Logo</label>
+
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setIsDragOver(true)
+            }}
+            onDragLeave={() => setIsDragOver(false)}
+            onDrop={handleDrop}
+            className={cn(
+              "flex min-h-40 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-center transition-colors",
+              isDragOver ? "border-foreground bg-accent" : "border-input hover:bg-accent/50",
+            )}
+          >
+            {currentImageUrl ? (
+              <div className="relative p-4">
+                <img
+                  src={currentImageUrl}
+                  alt="Brand preview"
+                  className="mx-auto size-24 rounded-md border object-cover"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="absolute top-2 right-2 size-6"
+                  onClick={clearFile}
+                >
+                  <X className="size-3.5" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="flex size-10 items-center justify-center rounded-full bg-accent">
+                  <Plus className="size-5 text-muted-foreground" />
+                </div>
+                <p className="text-sm font-medium">Click to upload or drag and drop</p>
+                <p className="text-xs text-muted-foreground">PNG, JPG or WEBP (Max: 5MB)</p>
+              </>
+            )}
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+
+          <p className="text-xs text-muted-foreground">
+            {isEditing
+              ? "Uploading replaces the current image. Processing happens in the background — refresh in a moment to see it."
+              : "Uploaded after the brand is created. Processing happens in the background."}
+          </p>
+        </div>
 
         <FormField
           control={form.control}

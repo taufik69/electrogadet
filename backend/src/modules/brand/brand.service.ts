@@ -1,3 +1,4 @@
+import slugify from "slugify"
 import { ApiError } from "../../shared/helpers/ApiError.js"
 import { toCursorResult } from "../../shared/utils/pagination.js"
 import { cached, bumpCacheVersions } from "../../shared/utils/cache.js"
@@ -6,6 +7,18 @@ import { NAVIGATION_CACHE_NAMESPACE } from "../../shared/constant/namespaces.js"
 import { brandRepository } from "./brand.repository.js"
 import { BRAND_CACHE_NAMESPACE } from "./brand.constant.js"
 import type { CreateBrandInput, ReorderBrandItem, UpdateBrandInput } from "./brand.types.js"
+
+/**
+ * Derives a brand's slug from `name` — the client never supplies one (see
+ * brand.validation.ts). Uniqueness is enforced by the caller checking
+ * findBySlug and throwing ApiError.conflict; two brands whose names slugify
+ * to the same value (e.g. "Sony" vs "sony!") is a real name collision the
+ * admin needs to resolve by renaming, not something to paper over with a
+ * silent -2 suffix.
+ */
+function generateSlug(name: string): string {
+  return slugify(name, { lower: true, strict: true })
+}
 
 export const brandService = {
   async listBrands(cursor: string | undefined, limit: number, includeInactive: boolean) {
@@ -31,11 +44,13 @@ export const brandService = {
   },
 
   async createBrand(input: CreateBrandInput) {
-    const existing = await brandRepository.findBySlug(input.slug)
+    const slug = generateSlug(input.name)
+    const existing = await brandRepository.findBySlug(slug)
     if (existing) {
-      throw ApiError.conflict(`Brand with slug "${input.slug}" already exists`)
+      throw ApiError.conflict(`A brand named "${input.name}" already exists`)
     }
-    const brand = await brandRepository.create(input)
+
+    const brand = await brandRepository.create({ ...input, slug })
     await bumpCacheVersions(BRAND_CACHE_NAMESPACE, NAVIGATION_CACHE_NAMESPACE)
     return brand
   },
@@ -46,7 +61,18 @@ export const brandService = {
       throw ApiError.notFound(`Brand with id "${id}" not found`)
     }
 
-    const brand = await brandRepository.update(id, input)
+    // Renaming re-derives the slug (confirmed intentional: storefront URLs
+    // move with the rename rather than staying pinned to the original name).
+    let slug: string | undefined
+    if (input.name && input.name !== existing.name) {
+      slug = generateSlug(input.name)
+      const collision = await brandRepository.findBySlug(slug)
+      if (collision && collision.id !== id) {
+        throw ApiError.conflict(`A brand named "${input.name}" already exists`)
+      }
+    }
+
+    const brand = await brandRepository.update(id, { ...input, ...(slug ? { slug } : {}) })
     await bumpCacheVersions(BRAND_CACHE_NAMESPACE, NAVIGATION_CACHE_NAMESPACE)
     return brand
   },

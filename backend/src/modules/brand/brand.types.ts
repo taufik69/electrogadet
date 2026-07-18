@@ -4,8 +4,9 @@ export type Brand = BrandModel
 
 export interface CreateBrandInput {
   name: string
-  slug: string
+  description?: string
   iconKey?: string
+  imageUrl?: string
   isActive?: boolean
   sortOrder?: number
 }

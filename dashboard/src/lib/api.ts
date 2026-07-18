@@ -29,6 +29,24 @@ async function request<T>(path: string, init?: RequestInit): Promise<ApiSuccess<
   return (await res.json()) as ApiSuccess<T>
 }
 
+/**
+ * For multipart/form-data uploads (image files) — no Content-Type header set
+ * here, so the browser generates the correct `multipart/form-data; boundary=…`
+ * itself. Setting it manually (as `request()` does for JSON) would omit the
+ * boundary and the server couldn't parse the body.
+ */
+export async function apiUpload<T>(path: string, formData: FormData): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, { method: "POST", body: formData })
+
+  if (!res.ok) {
+    const body = await res.json().catch(() => null)
+    throw new Error(body?.message ?? `Request failed with status ${res.status}`)
+  }
+
+  const body = (await res.json()) as ApiSuccess<T>
+  return body.data
+}
+
 /** For single-resource reads/writes — unwraps `data`, drops `meta` (there isn't one). */
 export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const body = await request<T>(path, init)

@@ -1,6 +1,10 @@
 import { prisma } from "../../shared/lib/prisma.js"
 import type { CreateBrandInput, ReorderBrandItem, UpdateBrandInput } from "./brand.types.js"
 
+/** brand.service.ts adds the server-generated `slug` before calling create()/update(). */
+type CreateBrandData = CreateBrandInput & { slug: string }
+type UpdateBrandData = UpdateBrandInput & { slug?: string }
+
 export const brandRepository = {
   async findManyByCursor(cursor: string | undefined, limit: number, includeInactive: boolean) {
     return prisma.brand.findMany({
@@ -19,11 +23,11 @@ export const brandRepository = {
     return prisma.brand.findUnique({ where: { slug } })
   },
 
-  async create(data: CreateBrandInput) {
+  async create(data: CreateBrandData) {
     return prisma.brand.create({ data })
   },
 
-  async update(id: string, data: UpdateBrandInput) {
+  async update(id: string, data: UpdateBrandData) {
     return prisma.brand.update({ where: { id }, data })
   },
 

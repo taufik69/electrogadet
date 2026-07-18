@@ -1,7 +1,8 @@
-import { Layers, Package, Tags, Zap } from "lucide-react"
+import { ChevronRight, List, Package, Plus, Tags, Zap } from "lucide-react"
 import { Link, useLocation } from "react-router"
 
 import { NavUser } from "@/components/nav-user"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import {
   Sidebar,
   SidebarContent,
@@ -12,13 +13,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-const navMain = [
-  { title: "Products", url: "/products", icon: Package },
-  { title: "Brands", url: "/brands", icon: Tags },
-  { title: "Categories", url: "/categories", icon: Layers },
+const navMain = [{ title: "Products", url: "/products", icon: Package }]
+
+const brandNav = [
+  { title: "Brand List", url: "/brands", icon: List },
+  { title: "Create Brand", url: "/brands/new", icon: Plus },
 ]
 
 const user = {
@@ -29,10 +34,11 @@ const user = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation()
+  const isBrandSectionActive = location.pathname.startsWith("/brands")
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="border-b border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
@@ -51,7 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <SidebarGroupLabel className="tracking-wide uppercase">Menu</SidebarGroupLabel>
           <SidebarMenu>
             {navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
@@ -63,6 +69,32 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
+
+            <Collapsible asChild defaultOpen={isBrandSectionActive} className="group/collapsible">
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton isActive={isBrandSectionActive} tooltip="Brand">
+                    <Tags />
+                    <span>Brand</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {brandNav.map((item) => (
+                      <SidebarMenuSubItem key={item.title}>
+                        <SidebarMenuSubButton asChild isActive={location.pathname === item.url}>
+                          <Link to={item.url}>
+                            <item.icon />
+                            <span>{item.title}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

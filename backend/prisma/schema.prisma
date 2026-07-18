@@ -47,14 +47,16 @@ enum AvailabilityStatus {
 // ─── Navigation hierarchy ────────────────────────────────────────────────────
 
 model Brand {
-  id       String  @id @default(cuid())
-  name     String
-  slug     String  @unique
-  iconKey  String?
+  id          String  @id @default(cuid())
+  name        String
+  /// Server-generated from name via slugify (brand.service.ts) — never accepted from the client.
+  slug        String  @unique
+  description String?
+  iconKey     String?
   /// Denormalized CDN url of the brand logo, written by the image worker when
   /// an upload completes. Exists so the sidebar query stays a two-level
   /// include instead of joining Image — see spec §2.3c.
-  imageUrl String?
+  imageUrl    String?
 
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)

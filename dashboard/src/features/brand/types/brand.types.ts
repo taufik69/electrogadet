@@ -1,7 +1,9 @@
 export interface Brand {
   id: string
   name: string
+  /** Server-derived from name via slugify — never entered or edited directly. */
   slug: string
+  description: string | null
   iconKey: string | null
   imageUrl: string | null
   isActive: boolean
@@ -10,38 +12,15 @@ export interface Brand {
   updatedAt: string
 }
 
+// slug is never sent — the backend derives it from `name` (see
+// backend/src/modules/brand/brand.service.ts generateSlug()). iconKey is
+// still accepted by the backend but this dashboard's form no longer offers
+// it; brand imagery is the uploaded photo instead.
 export interface CreateBrandInput {
   name: string
-  slug: string
-  iconKey?: string
+  description?: string
   isActive?: boolean
   sortOrder?: number
 }
 
-export type UpdateBrandInput = Partial<Omit<CreateBrandInput, "slug">>
-
-/**
- * Allowlist of icon keys the backend will actually accept and the storefront
- * can render (react-icons/si component names) — mirrors
- * backend/src/modules/brand/brand.constant.ts BRAND_ICON_KEYS. Sourcing the
- * dashboard's icon picker from this list, not free text, is what the backend
- * comment there asks for — an unrenderable key should never be enterable.
- */
-export const BRAND_ICON_KEYS = [
-  "SiApple",
-  "SiSamsung",
-  "SiSony",
-  "SiXiaomi",
-  "SiBose",
-  "SiJbl",
-  "SiAsus",
-  "SiLenovo",
-  "SiGoogle",
-  "SiLg",
-  "SiOneplus",
-  "SiHuawei",
-  "SiRazer",
-  "SiSonos",
-] as const
-
-export type BrandIconKey = (typeof BRAND_ICON_KEYS)[number]
+export type UpdateBrandInput = Partial<CreateBrandInput>

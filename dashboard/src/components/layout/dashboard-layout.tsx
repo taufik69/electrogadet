@@ -17,7 +17,11 @@ export function DashboardLayout() {
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
         </header>
-        <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 ml-0 md:ml-64 mr-10">
+        {/* SidebarInset already offsets its content by the sidebar's own
+            width/collapsed state — the old `ml-0 md:ml-64 mr-10` here was a
+            redundant, fixed-width margin fighting that, which broke alignment
+            whenever the sidebar was collapsed to icon mode. */}
+        <div className="flex min-w-0 flex-1 flex-col gap-4 p-4">
           <Outlet />
         </div>
       </SidebarInset>

@@ -15,10 +15,14 @@ import {
   SiRazer,
   SiSonos,
 } from "react-icons/si"
-import { BRAND_ICON_KEYS, type BrandIconKey } from "../types/brand.types"
 
-/** Mirrors frontend/src/lib/brand-icons.ts — same keys, same source components, kept in sync manually. */
-const BRAND_ICON_COMPONENTS: Record<BrandIconKey, IconType> = {
+/**
+ * The dashboard's create/edit form no longer sets iconKey (brand imagery is
+ * the uploaded photo instead — see brand-form.tsx), but existing/seeded
+ * brands still carry one, so the list view still resolves it for display.
+ * Mirrors frontend/src/lib/brand-icons.ts — same keys, kept in sync manually.
+ */
+const BRAND_ICON_COMPONENTS: Record<string, IconType> = {
   SiApple,
   SiSamsung,
   SiSony,
@@ -37,7 +41,5 @@ const BRAND_ICON_COMPONENTS: Record<BrandIconKey, IconType> = {
 
 export function resolveBrandIcon(iconKey: string | null | undefined): IconType | null {
   if (!iconKey) return null
-  return BRAND_ICON_COMPONENTS[iconKey as BrandIconKey] ?? null
+  return BRAND_ICON_COMPONENTS[iconKey] ?? null
 }
-
-export { BRAND_ICON_KEYS }
