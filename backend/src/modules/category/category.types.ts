@@ -4,7 +4,7 @@ export type Category = CategoryModel
 
 export interface CreateCategoryInput {
   name: string
-  slug: string
+  description?: string
   brandId: string
   parentId?: string
   isActive?: boolean

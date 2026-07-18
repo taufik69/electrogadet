@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createCategory, deleteCategory, fetchCategories, fetchCategoryById, updateCategory } from "../api/category.api"
+import { uploadCategoryImage } from "../api/category-image.api"
 import type { CreateCategoryInput, UpdateCategoryInput } from "../types/category.types"
 
 const CATEGORIES_KEY = ["categories"] as const
@@ -47,5 +48,17 @@ export function useDeleteCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: CATEGORIES_KEY })
     },
+  })
+}
+
+/**
+ * No onSuccess invalidation — same reasoning as useUploadBrandImage: the
+ * upload is processed asynchronously by the worker, so Category.imageUrl
+ * isn't populated by the time this resolves.
+ */
+export function useUploadCategoryImage() {
+  return useMutation({
+    mutationFn: ({ categoryId, file }: { categoryId: string; file: File }) =>
+      uploadCategoryImage(categoryId, file),
   })
 }

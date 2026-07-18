@@ -1,6 +1,7 @@
 import { ApiError } from "../../shared/helpers/ApiError.js"
 import { toCursorResult } from "../../shared/utils/pagination.js"
 import { cached, bumpCacheVersions } from "../../shared/utils/cache.js"
+import { generateSlug } from "../../shared/utils/slug.js"
 import { CACHE_TTL } from "../../shared/constant/cache.js"
 import { NAVIGATION_CACHE_NAMESPACE } from "../../shared/constant/namespaces.js"
 import { categoryRepository } from "./category.repository.js"
@@ -58,16 +59,17 @@ export const categoryService = {
   },
 
   async createCategory(input: CreateCategoryInput) {
-    const existing = await categoryRepository.findByBrandAndSlug(input.brandId, input.slug)
+    const slug = generateSlug(input.name)
+    const existing = await categoryRepository.findByBrandAndSlug(input.brandId, slug)
     if (existing) {
-      throw ApiError.conflict(`Category with slug "${input.slug}" already exists for this brand`)
+      throw ApiError.conflict(`A category named "${input.name}" already exists for this brand`)
     }
 
     if (input.parentId) {
       await assertValidParent(null, input.parentId)
     }
 
-    const category = await categoryRepository.create(input)
+    const category = await categoryRepository.create({ ...input, slug })
     await bumpCacheVersions(CATEGORY_CACHE_NAMESPACE, NAVIGATION_CACHE_NAMESPACE)
     return category
   },
@@ -82,7 +84,19 @@ export const categoryService = {
       await assertValidParent(id, input.parentId)
     }
 
-    const category = await categoryRepository.update(id, input)
+    // Renaming re-derives the slug within the same brand scope — same
+    // rationale as brand.service.ts updateBrand: storefront URLs move with
+    // the rename.
+    let slug: string | undefined
+    if (input.name && input.name !== existing.name) {
+      slug = generateSlug(input.name)
+      const collision = await categoryRepository.findByBrandAndSlug(existing.brandId, slug)
+      if (collision && collision.id !== id) {
+        throw ApiError.conflict(`A category named "${input.name}" already exists for this brand`)
+      }
+    }
+
+    const category = await categoryRepository.update(id, { ...input, ...(slug ? { slug } : {}) })
     await bumpCacheVersions(CATEGORY_CACHE_NAMESPACE, NAVIGATION_CACHE_NAMESPACE)
     return category
   },

@@ -1,4 +1,4 @@
-import { ChevronRight, List, Package, Plus, Tags, Zap } from "lucide-react"
+import { ChevronRight, Layers, List, Package, Plus, Tags, Zap } from "lucide-react"
 import { Link, useLocation } from "react-router"
 
 import { NavUser } from "@/components/nav-user"
@@ -21,9 +21,27 @@ import {
 
 const navMain = [{ title: "Products", url: "/products", icon: Package }]
 
-const brandNav = [
-  { title: "Brand List", url: "/brands", icon: List },
-  { title: "Create Brand", url: "/brands/new", icon: Plus },
+// Both entries follow the same "create first, then list" order (confirmed
+// convention — see brand's collapsible nav).
+const collapsibleNav = [
+  {
+    title: "Brand",
+    icon: Tags,
+    basePath: "/brands",
+    items: [
+      { title: "Create Brand", url: "/brands/new", icon: Plus },
+      { title: "Brand List", url: "/brands", icon: List },
+    ],
+  },
+  {
+    title: "Category",
+    icon: Layers,
+    basePath: "/categories",
+    items: [
+      { title: "Create Category", url: "/categories/new", icon: Plus },
+      { title: "Category List", url: "/categories", icon: List },
+    ],
+  },
 ]
 
 const user = {
@@ -34,7 +52,6 @@ const user = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation()
-  const isBrandSectionActive = location.pathname.startsWith("/brands")
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -70,31 +87,41 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </SidebarMenuItem>
             ))}
 
-            <Collapsible asChild defaultOpen={isBrandSectionActive} className="group/collapsible">
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton isActive={isBrandSectionActive} tooltip="Brand">
-                    <Tags />
-                    <span>Brand</span>
-                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {brandNav.map((item) => (
-                      <SidebarMenuSubItem key={item.title}>
-                        <SidebarMenuSubButton asChild isActive={location.pathname === item.url}>
-                          <Link to={item.url}>
-                            <item.icon />
-                            <span>{item.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
-            </Collapsible>
+            {collapsibleNav.map((section) => {
+              const isSectionActive = location.pathname.startsWith(section.basePath)
+              return (
+                <Collapsible
+                  key={section.title}
+                  asChild
+                  defaultOpen={isSectionActive}
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton isActive={isSectionActive} tooltip={section.title}>
+                        <section.icon />
+                        <span>{section.title}</span>
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {section.items.map((item) => (
+                          <SidebarMenuSubItem key={item.title}>
+                            <SidebarMenuSubButton asChild isActive={location.pathname === item.url}>
+                              <Link to={item.url}>
+                                <item.icon />
+                                <span>{item.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              )
+            })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>

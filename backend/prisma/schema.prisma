@@ -71,10 +71,11 @@ model Brand {
 }
 
 model Category {
-  id       String  @id @default(cuid())
-  name     String
-  slug     String
-  imageUrl String?
+  id          String  @id @default(cuid())
+  name        String
+  slug        String
+  description String?
+  imageUrl    String?
 
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)

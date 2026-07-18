@@ -1,23 +1,20 @@
 import { z } from "zod"
 import { cursorPaginationSchema } from "../../shared/types/pagination.js"
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-
+// slug is never accepted from the client — category.service.ts derives it
+// from `name` via slugify, same as brand.service.ts. brandId is immutable
+// after creation: moving a category between brands is a delete+recreate,
+// not an update (its slug uniqueness is scoped to (brandId, slug)).
 export const createCategorySchema = z.object({
   name: z.string().min(1),
-  slug: z.string().regex(slugPattern, "Must be lowercase, hyphen-separated"),
+  description: z.string().optional(),
   brandId: z.string().min(1),
   parentId: z.string().min(1).optional(),
   isActive: z.boolean().optional().default(true),
   sortOrder: z.number().int().min(0).optional().default(0),
 })
 
-// slug and brandId are immutable after creation — the slug is part of the
-// (brandId, slug) uniqueness key and the sidebar URL contract; moving a
-// category between brands is a delete+recreate, not an update.
-export const updateCategorySchema = createCategorySchema
-  .omit({ slug: true, brandId: true })
-  .partial()
+export const updateCategorySchema = createCategorySchema.omit({ brandId: true }).partial()
 
 export const listCategoriesQuerySchema = cursorPaginationSchema.extend({
   brandId: z.string().min(1).optional(),

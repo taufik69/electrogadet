@@ -2,6 +2,7 @@ export interface Category {
   id: string
   name: string
   slug: string
+  description: string | null
   imageUrl: string | null
   isActive: boolean
   sortOrder: number
@@ -11,16 +12,17 @@ export interface Category {
   updatedAt: string
 }
 
+// slug is never sent — the backend derives it from `name`, same as brand
+// (see backend/src/modules/category/category.service.ts generateSlug usage).
+// brandId is required on create (chosen via the form's brand dropdown) but
+// immutable after creation — see UpdateCategoryInput below.
 export interface CreateCategoryInput {
   name: string
-  slug: string
+  description?: string
   brandId: string
   parentId?: string
   isActive?: boolean
   sortOrder?: number
 }
 
-// slug and brandId are immutable after creation — the backend rejects both on
-// update (spec §9.4: slug is part of the (brandId, slug) uniqueness key and
-// the sidebar URL contract; moving brands is delete+recreate, not an update).
-export type UpdateCategoryInput = Partial<Omit<CreateCategoryInput, "slug" | "brandId">>
+export type UpdateCategoryInput = Partial<Omit<CreateCategoryInput, "brandId">>

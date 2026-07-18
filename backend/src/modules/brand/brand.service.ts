@@ -1,24 +1,12 @@
-import slugify from "slugify"
 import { ApiError } from "../../shared/helpers/ApiError.js"
 import { toCursorResult } from "../../shared/utils/pagination.js"
 import { cached, bumpCacheVersions } from "../../shared/utils/cache.js"
+import { generateSlug } from "../../shared/utils/slug.js"
 import { CACHE_TTL } from "../../shared/constant/cache.js"
 import { NAVIGATION_CACHE_NAMESPACE } from "../../shared/constant/namespaces.js"
 import { brandRepository } from "./brand.repository.js"
 import { BRAND_CACHE_NAMESPACE } from "./brand.constant.js"
 import type { CreateBrandInput, ReorderBrandItem, UpdateBrandInput } from "./brand.types.js"
-
-/**
- * Derives a brand's slug from `name` — the client never supplies one (see
- * brand.validation.ts). Uniqueness is enforced by the caller checking
- * findBySlug and throwing ApiError.conflict; two brands whose names slugify
- * to the same value (e.g. "Sony" vs "sony!") is a real name collision the
- * admin needs to resolve by renaming, not something to paper over with a
- * silent -2 suffix.
- */
-function generateSlug(name: string): string {
-  return slugify(name, { lower: true, strict: true })
-}
 
 export const brandService = {
   async listBrands(cursor: string | undefined, limit: number, includeInactive: boolean) {

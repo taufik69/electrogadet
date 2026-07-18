@@ -37,9 +37,13 @@ export function BrandsPage() {
 
   const filteredBrands = useMemo(() => {
     if (!brands) return brands
+    // Backend returns oldest-first (cursor pagination orders by id asc);
+    // reversed here so the most recently created brand shows at the top,
+    // which is what an admin expects right after creating one.
     const query = search.trim().toLowerCase()
-    if (!query) return brands
-    return brands.filter((brand) => brand.name.toLowerCase().includes(query))
+    const ordered = [...brands].reverse()
+    if (!query) return ordered
+    return ordered.filter((brand) => brand.name.toLowerCase().includes(query))
   }, [brands, search])
 
   function handleToggleActive(id: string, nextActive: boolean) {
@@ -147,31 +151,37 @@ export function BrandsPage() {
                         <TableCell className="text-muted-foreground">{brand.slug}</TableCell>
                         <TableCell className="text-muted-foreground">{brand.sortOrder}</TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Badge variant={brand.isActive ? "success" : "secondary"}>
-                              {brand.isActive ? "Active" : "Inactive"}
-                            </Badge>
+                          <Badge variant={brand.isActive ? "success" : "secondary"}>
+                            {brand.isActive ? "Active" : "Inactive"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button variant="outline" size="icon" className="size-9" asChild>
+                              <Link to={`/categories?brandId=${brand.id}`}>
+                                <Eye className="size-4" />
+                              </Link>
+                            </Button>
                             <Switch
                               checked={brand.isActive}
                               onCheckedChange={(checked) => handleToggleActive(brand.id, checked)}
                               aria-label={`Toggle ${brand.name} active status`}
+                              className="data-[state=checked]:bg-success"
                             />
+                            <Button variant="outline" size="icon" className="size-9" asChild>
+                              <Link to={`/brands/${brand.id}/edit`}>
+                                <Pencil className="size-4" />
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="icon"
+                              className="size-9"
+                              onClick={() => setDeleteId(brand.id)}
+                            >
+                              <Trash2 className="size-4" />
+                            </Button>
                           </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="icon" asChild>
-                            <Link to={`/categories?brandId=${brand.id}`}>
-                              <Eye />
-                            </Link>
-                          </Button>
-                          <Button variant="ghost" size="icon" asChild>
-                            <Link to={`/brands/${brand.id}/edit`}>
-                              <Pencil />
-                            </Link>
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(brand.id)}>
-                            <Trash2 className="text-destructive" />
-                          </Button>
                         </TableCell>
                       </TableRow>
                     )

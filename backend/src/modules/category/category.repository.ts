@@ -7,6 +7,10 @@ import type {
   UpdateCategoryInput,
 } from "./category.types.js"
 
+/** category.service.ts adds the server-generated `slug` before calling create()/update(). */
+type CreateCategoryData = CreateCategoryInput & { slug: string }
+type UpdateCategoryData = UpdateCategoryInput & { slug?: string }
+
 export const categoryRepository = {
   async findManyByCursor(
     cursor: string | undefined,
@@ -51,11 +55,11 @@ export const categoryRepository = {
     return ancestors
   },
 
-  async create(data: CreateCategoryInput) {
+  async create(data: CreateCategoryData) {
     return prisma.category.create({ data })
   },
 
-  async update(id: string, data: UpdateCategoryInput) {
+  async update(id: string, data: UpdateCategoryData) {
     return prisma.category.update({ where: { id }, data })
   },
 
