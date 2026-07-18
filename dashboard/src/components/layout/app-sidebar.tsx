@@ -1,4 +1,4 @@
-import { Megaphone, Package, Zap } from "lucide-react"
+import { Layers, Package, Tags, Zap } from "lucide-react"
 import { Link, useLocation } from "react-router"
 
 import { NavUser } from "@/components/nav-user"
@@ -17,7 +17,8 @@ import {
 
 const navMain = [
   { title: "Products", url: "/products", icon: Package },
-  { title: "Announcement Bar", url: "/announcements", icon: Megaphone },
+  { title: "Brands", url: "/brands", icon: Tags },
+  { title: "Categories", url: "/categories", icon: Layers },
 ]
 
 const user = {

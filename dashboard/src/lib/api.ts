@@ -7,7 +7,12 @@ interface ApiSuccess<T> {
   meta?: Record<string, unknown>
 }
 
-export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+export interface CursorMeta {
+  nextCursor: string | null
+  hasMore: boolean
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<ApiSuccess<T>> {
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
     headers: {
@@ -21,6 +26,22 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     throw new Error(body?.message ?? `Request failed with status ${res.status}`)
   }
 
-  const body = (await res.json()) as ApiSuccess<T>
+  return (await res.json()) as ApiSuccess<T>
+}
+
+/** For single-resource reads/writes — unwraps `data`, drops `meta` (there isn't one). */
+export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const body = await request<T>(path, init)
   return body.data
+}
+
+/**
+ * For cursor-paginated list endpoints — keeps `meta.nextCursor`/`hasMore`
+ * instead of discarding them. `apiFetch` alone can't page past the first
+ * batch, which silently truncated the old hardcoded-limit announcement list;
+ * don't repeat that for brand/category lists.
+ */
+export async function apiFetchPaged<T>(path: string, init?: RequestInit): Promise<{ data: T; meta: CursorMeta }> {
+  const body = await request<T>(path, init)
+  return { data: body.data, meta: (body.meta as unknown as CursorMeta) ?? { nextCursor: null, hasMore: false } }
 }

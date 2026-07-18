@@ -8,21 +8,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useDeleteAnnouncement } from "./hooks"
+import { useDeleteCategory } from "../hooks/useCategories"
 
-interface DeleteAnnouncementDialogProps {
+interface DeleteCategoryDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  announcementId: string | null
+  categoryId: string | null
   onDeleted?: () => void
 }
 
-export function DeleteAnnouncementDialog({ open, onOpenChange, announcementId, onDeleted }: DeleteAnnouncementDialogProps) {
-  const deleteMutation = useDeleteAnnouncement()
+export function DeleteCategoryDialog({ open, onOpenChange, categoryId, onDeleted }: DeleteCategoryDialogProps) {
+  const deleteMutation = useDeleteCategory()
 
   function handleDelete() {
-    if (!announcementId) return
-    deleteMutation.mutate(announcementId, {
+    if (!categoryId) return
+    deleteMutation.mutate(categoryId, {
       onSuccess: () => {
         onOpenChange(false)
         onDeleted?.()
@@ -34,9 +34,10 @@ export function DeleteAnnouncementDialog({ open, onOpenChange, announcementId, o
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete announcement?</AlertDialogTitle>
+          <AlertDialogTitle>Delete category?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete this announcement bar. This action cannot be undone.
+            This will permanently delete this category and remove its product links. Products themselves are not
+            deleted. This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
