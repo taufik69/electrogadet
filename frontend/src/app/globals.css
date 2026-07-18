@@ -27,6 +27,12 @@
   /* Hairline divider that reads on the dark sidebar surface */
   --color-sidebar-border: #3a3a3a;
 
+  /* Ambient background — neutral greys only. Visible enough to read as shape
+     and depth, still light enough that product cards stay the focal point. */
+  --color-blob-1: rgba(17, 24, 39, 0.16);
+  --color-blob-2: rgba(17, 24, 39, 0.12);
+  --color-blob-3: rgba(17, 24, 39, 0.1);
+
   /* Radius */
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -81,6 +87,10 @@
   --color-sidebar: var(--color-sidebar);
   --color-sidebar-elevated: var(--color-sidebar-elevated);
   --color-sidebar-border: var(--color-sidebar-border);
+
+  --color-blob-1: var(--color-blob-1);
+  --color-blob-2: var(--color-blob-2);
+  --color-blob-3: var(--color-blob-3);
 
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Header } from "@/components/header";
+import { AmbientBackground } from "@/components/ambient-background";
 import { CategorySidebar } from "@/components/category-sidebar";
 import { ChatWidget } from "@/components/chat-widget";
 import { Footer } from "@/components/footer";
@@ -37,9 +38,15 @@ export default function RootLayout({
         <div className="flex flex-1 items-stretch">
           <CategorySidebar />
 
-          <div className="flex min-w-0 flex-1 flex-col">
+          {/* `relative` + `isolate` scope the ambient blobs to this column so they
+              sit behind the content but never bleed over the dark sidebar. */}
+          <div className="relative isolate flex min-w-0 flex-1 flex-col">
+            <AmbientBackground />
+
             <Header />
-            <main className="min-w-0 flex-1 lg:pr-6 lg:pl-6">{children}</main>
+            <main className="relative z-10 min-w-0 flex-1 lg:pr-6 lg:pl-6">
+              {children}
+            </main>
             <Footer />
           </div>
         </div>
