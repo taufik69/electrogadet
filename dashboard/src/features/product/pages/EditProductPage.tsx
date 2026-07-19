@@ -20,7 +20,9 @@ import {
   useDetachProductCategory,
   useProduct,
   useUpdateProduct,
+  useUploadProductGalleryImage,
   useUploadProductThumbnail,
+  useUpsertProductSeo,
 } from "../hooks/useProducts"
 import type { UpdateProductInput } from "../types/product.types"
 
@@ -30,11 +32,13 @@ export function EditProductPage() {
   const { data: product, isLoading, isError, refetch } = useProduct(id)
   const updateMutation = useUpdateProduct()
   const uploadThumbnailMutation = useUploadProductThumbnail()
+  const uploadGalleryImageMutation = useUploadProductGalleryImage()
   const attachCategoryMutation = useAttachProductCategory()
   const detachCategoryMutation = useDetachProductCategory()
+  const upsertSeoMutation = useUpsertProductSeo()
   const [error, setError] = useState<string | null>(null)
 
-  function handleSubmit({ input, categoryId, thumbnailFile }: ProductFormSubmitValues) {
+  function handleSubmit({ input, categoryId, thumbnailFile, galleryFiles, seo }: ProductFormSubmitValues) {
     if (!id || !product) return
     setError(null)
 
@@ -45,6 +49,9 @@ export function EditProductPage() {
           if (thumbnailFile) {
             uploadThumbnailMutation.mutate({ productId: id, file: thumbnailFile })
           }
+          for (const file of galleryFiles) {
+            uploadGalleryImageMutation.mutate({ productId: id, file })
+          }
 
           const previousCategory = product.categories?.[0]?.category
           if (categoryId !== previousCategory?.id) {
@@ -54,6 +61,10 @@ export function EditProductPage() {
             if (categoryId) {
               attachCategoryMutation.mutate({ categoryId, productId: id })
             }
+          }
+
+          if (Object.values(seo).some((v) => (Array.isArray(v) ? v.length > 0 : v !== undefined))) {
+            upsertSeoMutation.mutate({ productId: id, input: seo })
           }
 
           navigate("/products")
@@ -117,6 +128,7 @@ export function EditProductPage() {
           <CardContent className="pt-6">
             <ProductForm
               product={product}
+              existingGalleryCount={product.gallery.length}
               isPending={updateMutation.isPending}
               onSubmit={handleSubmit}
               onCancel={() => navigate("/products")}

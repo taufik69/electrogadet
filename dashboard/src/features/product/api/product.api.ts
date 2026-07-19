@@ -1,5 +1,5 @@
 import { apiFetch, apiFetchPaged } from "@/lib/api"
-import type { CreateProductInput, Product, UpdateProductInput } from "../types/product.types"
+import type { CreateProductInput, Product, ProductSeo, UpdateProductInput, UpsertProductSeoInput } from "../types/product.types"
 
 export function fetchProducts(params: {
   cursor?: string
@@ -36,6 +36,13 @@ export function updateProduct(id: string, input: UpdateProductInput) {
 
 export function deleteProduct(id: string) {
   return apiFetch<null>(`/api/products/${id}`, { method: "DELETE" })
+}
+
+export function upsertProductSeo(productId: string, input: UpsertProductSeoInput) {
+  return apiFetch<ProductSeo>(`/api/products/${productId}/seo`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  })
 }
 
 /** Attaches a product to a category — the many-to-many join (see backend spec §4.2). */

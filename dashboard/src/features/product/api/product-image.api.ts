@@ -32,14 +32,6 @@ export function uploadProductGalleryImage(productId: string, file: File) {
   return apiUpload<ImageRecord>("/api/images", formData)
 }
 
-export function fetchProductThumbnail(productId: string) {
-  return apiFetch<ImageRecord[]>(`/api/images?ownerType=product_thumbnail&ownerId=${productId}`)
-}
-
-export function fetchProductGallery(productId: string) {
-  return apiFetch<ImageRecord[]>(`/api/images?ownerType=product_gallery&ownerId=${productId}`)
-}
-
 export function deleteProductImage(imageId: string) {
   return apiFetch<null>(`/api/images/${imageId}`, { method: "DELETE" })
 }

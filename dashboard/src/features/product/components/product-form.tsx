@@ -24,14 +24,12 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import type { CreateProductInput, Product, UpdateProductInput } from "../types/product.types"
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const availabilityStatusSchema = z.enum(["in_stock", "out_of_stock", "preorder"])
 
 const schema = z.object({
   brandId: z.string().optional(),
   categoryId: z.string().optional(),
   name: z.string().min(1, "Name is required"),
-  slug: z.string().regex(slugPattern, "Lowercase letters, numbers and hyphens only"),
   description: z.string().optional(),
   priceCents: z
     .string()
@@ -53,27 +51,56 @@ const schema = z.object({
   manufactureCountry: z.string().optional(),
   tags: z.string().optional(),
   isActive: z.boolean(),
+  metaTitle: z.string().max(70, "Max 70 characters").optional(),
+  metaDescription: z.string().max(200, "Max 200 characters").optional(),
+  metaKeywords: z.string().optional(),
+  ogTitle: z.string().max(70, "Max 70 characters").optional(),
+  ogDescription: z.string().max(200, "Max 200 characters").optional(),
+  canonicalUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
 })
 
 type FormValues = z.infer<typeof schema>
+
+export const MAX_PRODUCT_GALLERY_IMAGES = 10
+
+export interface ProductFormSeoValues {
+  metaTitle?: string
+  metaDescription?: string
+  metaKeywords?: string[]
+  ogTitle?: string
+  ogDescription?: string
+  canonicalUrl?: string
+}
 
 export interface ProductFormSubmitValues {
   input: CreateProductInput | UpdateProductInput
   categoryId: string | undefined
   thumbnailFile: File | null
+  galleryFiles: File[]
+  seo: ProductFormSeoValues
 }
 
 interface ProductFormProps {
   product?: Product
+  /** Count of gallery images already uploaded — used to cap new selections at MAX_PRODUCT_GALLERY_IMAGES total. */
+  existingGalleryCount?: number
   isPending: boolean
   onSubmit: (values: ProductFormSubmitValues) => void
   onCancel: () => void
   submitLabel: string
 }
 
-export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabel }: ProductFormProps) {
+export function ProductForm({
+  product,
+  existingGalleryCount = 0,
+  isPending,
+  onSubmit,
+  onCancel,
+  submitLabel,
+}: ProductFormProps) {
   const isEditing = !!product
   const existingCategory = product?.categories?.[0]?.category
+  const seo = product?.seo
 
   const { data: brandsData, isLoading: brandsLoading } = useBrands({ includeInactive: true })
   const brands = brandsData?.data
@@ -91,6 +118,12 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
   const [isDragOver, setIsDragOver] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([])
+  const [galleryPreviewUrls, setGalleryPreviewUrls] = useState<string[]>([])
+  const [isGalleryDragOver, setIsGalleryDragOver] = useState(false)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
+  const remainingGallerySlots = MAX_PRODUCT_GALLERY_IMAGES - existingGalleryCount - galleryFiles.length
+
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: product
@@ -98,7 +131,6 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
           brandId: product.brandId ?? "",
           categoryId: existingCategory?.id ?? "",
           name: product.name,
-          slug: product.slug,
           description: product.description ?? "",
           priceCents: String(product.priceCents),
           compareAtCents: product.compareAtCents != null ? String(product.compareAtCents) : "",
@@ -111,12 +143,17 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
           manufactureCountry: product.manufactureCountry ?? "",
           tags: product.tags.join(", "),
           isActive: product.isActive,
+          metaTitle: seo?.metaTitle ?? "",
+          metaDescription: seo?.metaDescription ?? "",
+          metaKeywords: seo?.metaKeywords?.join(", ") ?? "",
+          ogTitle: seo?.ogTitle ?? "",
+          ogDescription: seo?.ogDescription ?? "",
+          canonicalUrl: seo?.canonicalUrl ?? "",
         }
       : {
           brandId: "",
           categoryId: "",
           name: "",
-          slug: "",
           description: "",
           priceCents: "",
           compareAtCents: "",
@@ -129,6 +166,12 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
           manufactureCountry: "",
           tags: "",
           isActive: true,
+          metaTitle: "",
+          metaDescription: "",
+          metaKeywords: "",
+          ogTitle: "",
+          ogDescription: "",
+          canonicalUrl: "",
         },
   })
 
@@ -174,6 +217,32 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
     if (fileInputRef.current) fileInputRef.current.value = ""
   }
 
+  function addGalleryFiles(files: File[]) {
+    const accepted = files.filter((f) => f.type.startsWith("image/")).slice(0, Math.max(remainingGallerySlots, 0))
+    if (accepted.length === 0) return
+    setGalleryFiles((prev) => [...prev, ...accepted])
+    setGalleryPreviewUrls((prev) => [...prev, ...accepted.map((f) => URL.createObjectURL(f))])
+  }
+
+  function handleGalleryFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    addGalleryFiles(Array.from(e.target.files ?? []))
+    e.target.value = ""
+  }
+
+  function handleGalleryDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault()
+    setIsGalleryDragOver(false)
+    addGalleryFiles(Array.from(e.dataTransfer.files ?? []))
+  }
+
+  function removeGalleryFile(index: number) {
+    setGalleryPreviewUrls((prev) => {
+      URL.revokeObjectURL(prev[index])
+      return prev.filter((_, i) => i !== index)
+    })
+    setGalleryFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
   function handleSubmit(values: FormValues) {
     const tags = values.tags
       ? values.tags
@@ -181,8 +250,14 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
           .map((t) => t.trim())
           .filter(Boolean)
       : []
+    const metaKeywords = values.metaKeywords
+      ? values.metaKeywords
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean)
+      : []
 
-    const shared = {
+    const input = {
       name: values.name,
       description: values.description || undefined,
       priceCents: Number(values.priceCents),
@@ -199,15 +274,20 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
       brandId: values.brandId || undefined,
     }
 
-    if (isEditing) {
-      onSubmit({ input: shared, categoryId: values.categoryId || undefined, thumbnailFile })
-    } else {
-      onSubmit({
-        input: { ...shared, slug: values.slug },
-        categoryId: values.categoryId || undefined,
-        thumbnailFile,
-      })
-    }
+    onSubmit({
+      input,
+      categoryId: values.categoryId || undefined,
+      thumbnailFile,
+      galleryFiles,
+      seo: {
+        metaTitle: values.metaTitle || undefined,
+        metaDescription: values.metaDescription || undefined,
+        metaKeywords,
+        ogTitle: values.ogTitle || undefined,
+        ogDescription: values.ogDescription || undefined,
+        canonicalUrl: values.canonicalUrl || undefined,
+      },
+    })
   }
 
   const currentThumbnailUrl = thumbnailPreviewUrl ?? null
@@ -221,7 +301,7 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
                 selectedBrandId (plain useState), not an RHF-registered field,
                 so there's no enclosing <FormField> to supply useFormField's
                 context (same reasoning as the thumbnail upload block below). */}
-            <label className="text-sm font-medium leading-none">Brand</label>
+            <label className="text-sm font-medium leading-none mb-[3px] block">Brand</label>
             <Select value={selectedBrandId} onValueChange={handleBrandChange} disabled={brandsLoading}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder={brandsLoading ? "Loading..." : "Select a brand"} />
@@ -290,30 +370,25 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="slug"
-          render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel>Slug</FormLabel>
-              <FormControl>
-                <Input className="w-full" placeholder="ipad-pro-13-m5-2025" disabled={isEditing} {...field} />
-              </FormControl>
-              <FormDescription>
-                {isEditing
-                  ? "Slug can't be changed after creation — it's part of the storefront URL."
-                  : "Used in the storefront URL /products/<slug>. Lowercase, hyphen-separated."}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {isEditing && (
+          <div className="w-full space-y-2">
+            {/* Plain <label>, not FormField — slug isn't user-editable, so
+                it's not registered with react-hook-form at all. It's
+                generated server-side from the name and shown here read-only. */}
+            <label className="text-sm font-medium leading-none mb-[3px] block">Slug</label>
+            <Input className="w-full" value={product.slug} disabled readOnly />
+            <p className="text-sm text-muted-foreground">
+              Generated automatically from the name. Used in the storefront URL /products/&lt;slug&gt; and can&apos;t
+              be changed.
+            </p>
+          </div>
+        )}
 
         <div className="w-full space-y-2">
           {/* Plain <label>, not FormLabel — thumbnailFile/previewUrl are
               useState, not react-hook-form fields (same reasoning as
               category-form.tsx's image block). */}
-          <label className="text-sm font-medium leading-none">Product Thumbnail</label>
+          <label className="text-sm font-medium leading-none mb-[3px] block">Product Thumbnail</label>
 
           <div
             role="button"
@@ -365,6 +440,72 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
             {isEditing
               ? "Uploading replaces the current thumbnail. Processing happens in the background — refresh in a moment to see it."
               : "Uploaded after the product is created. Processing happens in the background."}
+          </p>
+        </div>
+
+        <div className="w-full space-y-2">
+          {/* Plain <label>, not FormField — gallery files are useState, not
+              react-hook-form fields (same reasoning as the thumbnail block above). */}
+          <label className="text-sm font-medium leading-none mb-[3px] block">Product Gallery</label>
+
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => remainingGallerySlots > 0 && galleryInputRef.current?.click()}
+            onKeyDown={(e) => e.key === "Enter" && remainingGallerySlots > 0 && galleryInputRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault()
+              if (remainingGallerySlots > 0) setIsGalleryDragOver(true)
+            }}
+            onDragLeave={() => setIsGalleryDragOver(false)}
+            onDrop={handleGalleryDrop}
+            className={cn(
+              "flex min-h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-center transition-colors",
+              remainingGallerySlots > 0 ? "cursor-pointer" : "cursor-not-allowed opacity-50",
+              isGalleryDragOver ? "border-foreground bg-accent" : "border-input hover:bg-accent/50",
+            )}
+          >
+            <div className="flex size-10 items-center justify-center rounded-full bg-accent">
+              <Plus className="size-5 text-muted-foreground" />
+            </div>
+            <p className="text-sm font-medium">
+              {remainingGallerySlots > 0 ? "Click to upload or drag and drop" : "Gallery limit reached"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              PNG, JPG or WEBP (Max: 5MB) — {remainingGallerySlots} of {MAX_PRODUCT_GALLERY_IMAGES} slots left
+            </p>
+          </div>
+
+          <input
+            ref={galleryInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleGalleryFileChange}
+            className="hidden"
+          />
+
+          {galleryPreviewUrls.length > 0 && (
+            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+              {galleryPreviewUrls.map((url, index) => (
+                <div key={url} className="relative">
+                  <img src={url} alt="" className="aspect-square w-full rounded-md border object-cover" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="absolute top-1 right-1 size-5"
+                    onClick={() => removeGalleryFile(index)}
+                  >
+                    <X className="size-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p className="text-xs text-muted-foreground">
+            Uploaded {isEditing ? "on save" : "after the product is created"}. Processing happens in the background.
           </p>
         </div>
 
@@ -533,6 +674,104 @@ export function ProductForm({ product, isPending, onSubmit, onCancel, submitLabe
             </FormItem>
           )}
         />
+
+        <div className="w-full space-y-4 rounded-lg border p-4">
+          <div>
+            <h3 className="text-sm font-semibold">SEO</h3>
+            <p className="text-sm text-muted-foreground">
+              Controls how this product appears in search results and link previews.
+            </p>
+          </div>
+
+          <div className="grid w-full gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="metaTitle"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Meta title</FormLabel>
+                  <FormControl>
+                    <Input className="w-full" placeholder="Optional — defaults to product name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="canonicalUrl"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Canonical URL</FormLabel>
+                  <FormControl>
+                    <Input className="w-full" placeholder="Optional" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="metaDescription"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Meta description</FormLabel>
+                <FormControl>
+                  <Textarea className="w-full" placeholder="Optional" rows={2} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="metaKeywords"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Meta keywords</FormLabel>
+                <FormControl>
+                  <Input className="w-full" placeholder="wireless, noise-cancelling" {...field} />
+                </FormControl>
+                <FormDescription>Comma-separated.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid w-full gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="ogTitle"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Social share title</FormLabel>
+                  <FormControl>
+                    <Input className="w-full" placeholder="Optional — defaults to meta title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ogDescription"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Social share description</FormLabel>
+                  <FormControl>
+                    <Input className="w-full" placeholder="Optional — defaults to meta description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
 
         <FormField
           control={form.control}

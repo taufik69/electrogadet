@@ -14,17 +14,25 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ProductForm, type ProductFormSubmitValues } from "../components/product-form"
-import { useAttachProductCategory, useCreateProduct, useUploadProductThumbnail } from "../hooks/useProducts"
+import {
+  useAttachProductCategory,
+  useCreateProduct,
+  useUploadProductGalleryImage,
+  useUploadProductThumbnail,
+  useUpsertProductSeo,
+} from "../hooks/useProducts"
 import type { CreateProductInput } from "../types/product.types"
 
 export function CreateProductPage() {
   const navigate = useNavigate()
   const createMutation = useCreateProduct()
   const uploadThumbnailMutation = useUploadProductThumbnail()
+  const uploadGalleryImageMutation = useUploadProductGalleryImage()
   const attachCategoryMutation = useAttachProductCategory()
+  const upsertSeoMutation = useUpsertProductSeo()
   const [error, setError] = useState<string | null>(null)
 
-  function handleSubmit({ input, categoryId, thumbnailFile }: ProductFormSubmitValues) {
+  function handleSubmit({ input, categoryId, thumbnailFile, galleryFiles, seo }: ProductFormSubmitValues) {
     setError(null)
     createMutation.mutate(input as CreateProductInput, {
       onSuccess: (product) => {
@@ -33,8 +41,14 @@ export function CreateProductPage() {
         if (thumbnailFile) {
           uploadThumbnailMutation.mutate({ productId: product.id, file: thumbnailFile })
         }
+        for (const file of galleryFiles) {
+          uploadGalleryImageMutation.mutate({ productId: product.id, file })
+        }
         if (categoryId) {
           attachCategoryMutation.mutate({ categoryId, productId: product.id })
+        }
+        if (Object.values(seo).some((v) => (Array.isArray(v) ? v.length > 0 : v !== undefined))) {
+          upsertSeoMutation.mutate({ productId: product.id, input: seo })
         }
         navigate("/products")
       },

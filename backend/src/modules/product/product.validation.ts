@@ -2,7 +2,6 @@ import { z } from "zod"
 import { cursorPaginationSchema } from "../../shared/types/pagination.js"
 import type { Prisma } from "../../generated/prisma/client.js"
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const availabilityStatusSchema = z.enum(["in_stock", "out_of_stock", "preorder"])
 const twitterCardSchema = z.enum(["summary", "summary_large_image", "app", "player"])
 
@@ -14,7 +13,6 @@ const jsonValueSchema: z.ZodType<Prisma.InputJsonValue> = z.lazy(() =>
 
 export const createProductSchema = z.object({
   name: z.string().min(1),
-  slug: z.string().regex(slugPattern, "Must be lowercase, hyphen-separated"),
   description: z.string().optional(),
   priceCents: z.number().int().min(0),
   compareAtCents: z.number().int().min(0).optional(),
@@ -34,9 +32,9 @@ export const createProductSchema = z.object({
   brandId: z.string().min(1).optional(),
 })
 
-// slug is immutable after creation — see brand/category validation for the
-// same rule and rationale (spec §9.4).
-export const updateProductSchema = createProductSchema.omit({ slug: true }).partial()
+// slug is server-generated and immutable — never accepted from the client,
+// same rule as brand/category (spec §9.4).
+export const updateProductSchema = createProductSchema.partial()
 
 export const listProductsQuerySchema = cursorPaginationSchema.extend({
   brandId: z.string().min(1).optional(),

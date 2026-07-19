@@ -7,7 +7,6 @@ export type ProductSeo = ProductSeoModel
 
 export interface CreateProductInput {
   name: string
-  slug: string
   description?: string
   priceCents: number
   compareAtCents?: number

@@ -2,7 +2,7 @@ import { ApiError } from "../../shared/helpers/ApiError.js"
 import { bumpCacheVersion } from "../../shared/utils/cache.js"
 import { enqueueImageDelete, enqueueImageUpload } from "../../shared/queues/image.queue.js"
 import { imageRepository } from "./image.repository.js"
-import { IMAGE_CACHE_NAMESPACE } from "./image.constant.js"
+import { IMAGE_CACHE_NAMESPACE, MAX_PRODUCT_GALLERY_IMAGES } from "./image.constant.js"
 import type { ImageOwnerType } from "../../generated/prisma/enums.js"
 import type { CreateImageInput, ReorderImageItem } from "./image.types.js"
 
@@ -18,6 +18,13 @@ export const imageService = {
    * see status flip through processing -> uploaded | failed.
    */
   async createImage(input: CreateImageInput) {
+    if (input.ownerType === "product_gallery") {
+      const count = await imageRepository.countByOwner(input.ownerType, input.ownerId)
+      if (count >= MAX_PRODUCT_GALLERY_IMAGES) {
+        throw ApiError.conflict(`A product's gallery cannot exceed ${MAX_PRODUCT_GALLERY_IMAGES} images`)
+      }
+    }
+
     const image = await imageRepository.create(input)
     await enqueueImageUpload({
       imageId: image.id,

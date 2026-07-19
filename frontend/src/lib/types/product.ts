@@ -2,12 +2,13 @@ export interface Product {
   id: string
   name: string
   slug: string
-  /** Nullable in the backend schema; falls back to a placeholder for display. */
-  imageUrl?: string | null
   priceCents: number
   compareAtCents?: number | null
   createdAt: string
   updatedAt: string
+  /** Populated server-side (backend product.service.ts attachImages) — null until an upload finishes. */
+  thumbnail?: { url: string; status: "pending" | "processing" | "uploaded" | "failed" } | null
+  gallery?: { url: string; status: "pending" | "processing" | "uploaded" | "failed" }[]
 }
 
 /**

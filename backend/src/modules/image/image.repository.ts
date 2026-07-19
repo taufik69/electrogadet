@@ -14,6 +14,10 @@ export const imageRepository = {
     return prisma.image.findUnique({ where: { id } })
   },
 
+  async countByOwner(ownerType: ImageOwnerType, ownerId: string) {
+    return prisma.image.count({ where: { ownerType, ownerId } })
+  },
+
   async create(data: CreateImageInput) {
     return prisma.image.create({ data })
   },

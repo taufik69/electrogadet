@@ -7,7 +7,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
 async function getActiveAnnouncement(): Promise<AnnouncementBarData | null> {
   try {
     const res = await fetch(`${API_URL}/api/announcements/active`, {
-      next: { revalidate: 60 },
+      cache: "no-store",
     })
     if (!res.ok) return null
     const body = await res.json()

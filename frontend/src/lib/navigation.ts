@@ -12,13 +12,12 @@ interface SidebarResponse {
  * thrown error here would take down the whole site. Degrades to an empty
  * array on any failure, same pattern as fetchProducts/getActiveAnnouncement.
  *
- * revalidate: 300 matches the backend's CACHE_TTL.LONG for this endpoint
- * (spec §9.2) — no point revalidating more often than the origin cache changes.
+ * No caching — always reflects whatever's currently in the backend.
  */
 export async function fetchSidebar(): Promise<SidebarBrand[]> {
   try {
     const res = await fetch(`${API_URL}/api/navigation/sidebar`, {
-      next: { revalidate: 300, tags: ["navigation"] },
+      cache: "no-store",
     })
     if (!res.ok) return []
     const body: SidebarResponse = await res.json()

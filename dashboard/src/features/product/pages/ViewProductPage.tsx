@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useProduct, useProductGallery, useProductThumbnail } from "../hooks/useProducts"
+import { useProduct } from "../hooks/useProducts"
 
 function formatPrice(cents: number | null) {
   if (cents === null) return "—"
@@ -38,10 +38,9 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
 export function ViewProductPage() {
   const { id } = useParams<{ id: string }>()
   const { data: product, isLoading, isError, refetch } = useProduct(id)
-  const { data: thumbnails } = useProductThumbnail(id)
-  const { data: gallery } = useProductGallery(id)
 
-  const thumbnailUrl = thumbnails?.find((img) => img.status === "uploaded")?.url
+  const thumbnailUrl = product?.thumbnail?.status === "uploaded" ? product.thumbnail.url : undefined
+  const gallery = product?.gallery.filter((img) => img.status === "uploaded") ?? []
   const category = product?.categories?.[0]?.category
 
   return (
@@ -111,13 +110,11 @@ export function ViewProductPage() {
                 </div>
               )}
 
-              {gallery && gallery.length > 0 && (
+              {gallery.length > 0 && (
                 <div className="grid grid-cols-3 gap-2">
-                  {gallery
-                    .filter((img) => img.status === "uploaded")
-                    .map((img) => (
-                      <img key={img.id} src={img.url} alt="" className="aspect-square rounded-md border object-cover" />
-                    ))}
+                  {gallery.map((img) => (
+                    <img key={img.id} src={img.url} alt="" className="aspect-square rounded-md border object-cover" />
+                  ))}
                 </div>
               )}
             </CardContent>
@@ -132,6 +129,7 @@ export function ViewProductPage() {
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2">
               <Field label="Slug" value={product.slug} />
+              <Field label="Brand" value={product.brand?.name} />
               <Field label="Category" value={category?.name} />
               <Field label="Price" value={formatPrice(product.priceCents)} />
               <Field label="Compare-at price" value={formatPrice(product.compareAtCents)} />

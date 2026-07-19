@@ -25,19 +25,25 @@ function hashToIndex(id: string, length: number): number {
 
 export function toProductCardData(product: Product, index: number): ProductCardData {
   const imageIndex = hashToIndex(product.id, PLACEHOLDER_IMAGES.length)
-  // Prefer the product's own image; fall back to a deterministic placeholder.
-  const imageUrl = product.imageUrl ?? PLACEHOLDER_IMAGES[imageIndex]
+  const uploadedThumbnail = product.thumbnail?.status === "uploaded" ? product.thumbnail.url : undefined
+  const uploadedGallery = (product.gallery ?? []).filter((img) => img.status === "uploaded").map((img) => img.url)
+
+  // Prefer whatever's actually been uploaded in the backend; fall back to a
+  // deterministic placeholder only when nothing's been uploaded yet.
+  const imageUrl = uploadedThumbnail ?? uploadedGallery[0] ?? PLACEHOLDER_IMAGES[imageIndex]
   const hasRating = hashToIndex(product.id + "rating", 4) !== 0
   const isNew = index < 3
   const isBestseller = !isNew && index < 8 && hashToIndex(product.id + "badge", 3) === 0
   const hasDiscount = hashToIndex(product.id + "discount", 5) === 0
 
-  // Stand-in gallery: 3–5 consecutive placeholder images starting at the product's own.
-  const galleryLength = 3 + hashToIndex(product.id + "gallery", 3)
-  const imageUrls = Array.from(
-    { length: galleryLength },
-    (_, offset) => PLACEHOLDER_IMAGES[(imageIndex + offset) % PLACEHOLDER_IMAGES.length]
-  )
+  // Prefer the real uploaded gallery; only synthesize placeholder filler when empty.
+  const imageUrls =
+    uploadedGallery.length > 0
+      ? uploadedGallery
+      : Array.from(
+          { length: 3 + hashToIndex(product.id + "gallery", 3) },
+          (_, offset) => PLACEHOLDER_IMAGES[(imageIndex + offset) % PLACEHOLDER_IMAGES.length]
+        )
 
   return {
     ...product,

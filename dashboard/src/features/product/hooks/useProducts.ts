@@ -7,17 +7,18 @@ import {
   fetchProductById,
   fetchProducts,
   updateProduct,
+  upsertProductSeo,
 } from "../api/product.api"
-import {
-  deleteProductImage,
-  fetchProductGallery,
-  fetchProductThumbnail,
-  uploadProductGalleryImage,
-  uploadProductThumbnail,
-} from "../api/product-image.api"
-import type { CreateProductInput, UpdateProductInput } from "../types/product.types"
+import { deleteProductImage, uploadProductGalleryImage, uploadProductThumbnail } from "../api/product-image.api"
+import type { CreateProductInput, Product, UpdateProductInput, UpsertProductSeoInput } from "../types/product.types"
 
 const PRODUCTS_KEY = ["products"] as const
+
+/** True while the product's thumbnail or any gallery image is still in the worker queue. */
+function hasPendingImages(product: Product | undefined) {
+  const images = [product?.thumbnail, ...(product?.gallery ?? [])].filter((img) => img != null)
+  return images.some((img) => img.status === "pending" || img.status === "processing")
+}
 
 export function useProducts(params?: { brandId?: string; includeInactive?: boolean }) {
   return useQuery({
@@ -26,11 +27,18 @@ export function useProducts(params?: { brandId?: string; includeInactive?: boole
   })
 }
 
+/**
+ * Polls every 1.5s while the product's thumbnail/gallery has an image still
+ * pending/processing, so a mounted view picks up the worker's Cloudinary
+ * upload without a manual refresh — uploads resolve fully in the background
+ * (see useUploadProductThumbnail), so nothing else would ever refetch this.
+ */
 export function useProduct(id: string | undefined) {
   return useQuery({
     queryKey: [...PRODUCTS_KEY, id],
     queryFn: () => fetchProductById(id!),
     enabled: !!id,
+    refetchInterval: (query) => (hasPendingImages(query.state.data) ? 1500 : false),
   })
 }
 
@@ -64,6 +72,17 @@ export function useDeleteProduct() {
   })
 }
 
+export function useUpsertProductSeo() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ productId, input }: { productId: string; input: UpsertProductSeoInput }) =>
+      upsertProductSeo(productId, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PRODUCTS_KEY })
+    },
+  })
+}
+
 export function useAttachProductCategory() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -87,36 +106,28 @@ export function useDetachProductCategory() {
 }
 
 /**
- * No onSuccess invalidation — same reasoning as brand/category image uploads:
- * the worker processes uploads asynchronously, so the image isn't `uploaded`
- * by the time this resolves and refetching now would just show "pending" again.
+ * Invalidates the product detail query on success so a mounted view picks up
+ * the new `pending` row immediately — useProduct then polls (see above) until
+ * the worker flips it to `uploaded` (or `failed`).
  */
 export function useUploadProductThumbnail() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ productId, file }: { productId: string; file: File }) => uploadProductThumbnail(productId, file),
+    onSuccess: (_data, { productId }) => {
+      queryClient.invalidateQueries({ queryKey: [...PRODUCTS_KEY, productId] })
+    },
   })
 }
 
 export function useUploadProductGalleryImage() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: ({ productId, file }: { productId: string; file: File }) =>
       uploadProductGalleryImage(productId, file),
-  })
-}
-
-export function useProductThumbnail(productId: string | undefined) {
-  return useQuery({
-    queryKey: [...PRODUCTS_KEY, productId, "thumbnail"],
-    queryFn: () => fetchProductThumbnail(productId!),
-    enabled: !!productId,
-  })
-}
-
-export function useProductGallery(productId: string | undefined) {
-  return useQuery({
-    queryKey: [...PRODUCTS_KEY, productId, "gallery"],
-    queryFn: () => fetchProductGallery(productId!),
-    enabled: !!productId,
+    onSuccess: (_data, { productId }) => {
+      queryClient.invalidateQueries({ queryKey: [...PRODUCTS_KEY, productId] })
+    },
   })
 }
 
