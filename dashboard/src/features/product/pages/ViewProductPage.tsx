@@ -15,9 +15,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useProduct } from "../hooks/useProducts"
 
-function formatPrice(cents: number | null) {
-  if (cents === null) return "—"
-  return (cents / 100).toLocaleString(undefined, { style: "currency", currency: "USD" })
+/** Stored in kopeks (1/100 of a ruble), same minor-unit convention as the priceCents column. */
+function formatPrice(kopeks: number | null) {
+  if (kopeks === null) return "—"
+  return (kopeks / 100).toLocaleString("ru-RU", { style: "currency", currency: "RUB" })
 }
 
 const availabilityLabel: Record<string, string> = {

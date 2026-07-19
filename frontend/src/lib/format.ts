@@ -1,6 +1,10 @@
-export function formatPriceCents(cents: number, currency = "USD"): string {
-  return new Intl.NumberFormat("en-US", {
+/**
+ * Prices are stored in minor units (kopeks) on the backend's priceCents column
+ * — same convention the dashboard formats against, so both surfaces agree.
+ */
+export function formatPriceCents(kopeks: number, currency = "RUB"): string {
+  return new Intl.NumberFormat("ru-RU", {
     style: "currency",
     currency,
-  }).format(cents / 100)
+  }).format(kopeks / 100)
 }

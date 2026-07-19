@@ -29,8 +29,9 @@ import {
 import { DeleteProductDialog } from "../components/delete-product-dialog"
 import { useProducts, useUpdateProduct } from "../hooks/useProducts"
 
-function formatPrice(cents: number) {
-  return (cents / 100).toLocaleString(undefined, { style: "currency", currency: "USD" })
+/** Stored in kopeks (1/100 of a ruble), same minor-unit convention as the priceCents column. */
+function formatPrice(kopeks: number) {
+  return (kopeks / 100).toLocaleString("ru-RU", { style: "currency", currency: "RUB" })
 }
 
 export function ProductsPage() {

@@ -27,7 +27,7 @@ import type { CreateProductInput, Product, UpdateProductInput } from "../types/p
 const availabilityStatusSchema = z.enum(["in_stock", "out_of_stock", "preorder"])
 
 const schema = z.object({
-  brandId: z.string().optional(),
+  brandId: z.string().min(1, "Please select a brand"),
   categoryId: z.string().min(1, "Please select a category"),
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
@@ -127,6 +127,7 @@ export function ProductForm({
   const [galleryFiles, setGalleryFiles] = useState<File[]>([])
   const [galleryPreviewUrls, setGalleryPreviewUrls] = useState<string[]>([])
   const [isGalleryDragOver, setIsGalleryDragOver] = useState(false)
+  const [galleryError, setGalleryError] = useState<string | null>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
   const remainingGallerySlots = MAX_PRODUCT_GALLERY_IMAGES - existingGalleryCount - galleryFiles.length
 
@@ -181,7 +182,9 @@ export function ProductForm({
 
   function handleBrandChange(value: string) {
     setSelectedBrandId(value)
-    form.setValue("brandId", value)
+    // shouldValidate clears the "Please select a brand" error as soon as one
+    // is picked, instead of leaving it up until the next submit.
+    form.setValue("brandId", value, { shouldValidate: true })
     // Categories belong to exactly one brand — switching brand invalidates
     // whatever category was previously chosen.
     form.setValue("categoryId", "")
@@ -210,6 +213,7 @@ export function ProductForm({
     })
     setGalleryFiles([])
     setThumbnailError(null)
+    setGalleryError(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetSignal])
 
@@ -244,6 +248,7 @@ export function ProductForm({
     if (accepted.length === 0) return
     setGalleryFiles((prev) => [...prev, ...accepted])
     setGalleryPreviewUrls((prev) => [...prev, ...accepted.map((f) => URL.createObjectURL(f))])
+    setGalleryError(null)
   }
 
   function handleGalleryFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -266,12 +271,15 @@ export function ProductForm({
   }
 
   function handleSubmit(values: FormValues) {
-    // Thumbnail isn't an RHF field (see setFile/thumbnailFile above), so its
-    // required check can't live in the zod schema — gate the submit here instead.
-    if (!thumbnailFile && !hasExistingThumbnail) {
-      setThumbnailError("Thumbnail is required")
-      return
-    }
+    // Thumbnail and gallery aren't RHF fields (see setFile/galleryFiles above),
+    // so their required checks can't live in the zod schema — gate the submit
+    // here instead. Both errors are set before returning so the admin sees
+    // everything that's missing at once, not one at a time.
+    const missingThumbnail = !thumbnailFile && !hasExistingThumbnail
+    const missingGallery = galleryFiles.length === 0 && existingGalleryCount === 0
+    setThumbnailError(missingThumbnail ? "Thumbnail is required" : null)
+    setGalleryError(missingGallery ? "At least one gallery image is required" : null)
+    if (missingThumbnail || missingGallery) return
 
     const tags = values.tags
       ? values.tags
@@ -299,7 +307,7 @@ export function ProductForm({
       manufactureCountry: values.manufactureCountry || undefined,
       tags,
       isActive: values.isActive,
-      brandId: values.brandId || undefined,
+      brandId: values.brandId,
     }
 
     onSubmit({
@@ -324,26 +332,37 @@ export function ProductForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full space-y-6">
         <div className="grid w-full gap-4 sm:grid-cols-2">
-          <div className="w-full space-y-2">
-            {/* Plain <label>, not FormLabel/FormItem — brand selection drives
-                selectedBrandId (plain useState), not an RHF-registered field,
-                so there's no enclosing <FormField> to supply useFormField's
-                context (same reasoning as the thumbnail upload block below). */}
-            <label className="text-sm font-medium leading-none mb-[3px] block">Brand</label>
-            <Select value={selectedBrandId} onValueChange={handleBrandChange} disabled={brandsLoading}>
-              <SelectTrigger className="h-11 w-full rounded-lg">
-                <SelectValue placeholder={brandsLoading ? "Loading..." : "Select a brand"} />
-              </SelectTrigger>
-              <SelectContent>
-                {brands?.map((brand) => (
-                  <SelectItem key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-sm text-muted-foreground">Choosing a brand loads its categories below.</p>
-          </div>
+          <FormField
+            control={form.control}
+            name="brandId"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel className="mb-2">
+                  Brand
+                  <Required />
+                </FormLabel>
+                {/* onValueChange goes through handleBrandChange (not field.onChange
+                    directly) because picking a brand also drives selectedBrandId,
+                    which loads the category list and clears any stale category. */}
+                <Select value={field.value} onValueChange={handleBrandChange} disabled={brandsLoading}>
+                  <FormControl>
+                    <SelectTrigger className="h-11 w-full rounded-lg">
+                      <SelectValue placeholder={brandsLoading ? "Loading..." : "Select a brand"} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {brands?.map((brand) => (
+                      <SelectItem key={brand.id} value={brand.id}>
+                        {brand.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>Choosing a brand loads its categories below.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
@@ -486,8 +505,12 @@ export function ProductForm({
 
         <div className="w-full space-y-2">
           {/* Plain <label>, not FormField — gallery files are useState, not
-              react-hook-form fields (same reasoning as the thumbnail block above). */}
-          <label className="text-sm font-medium leading-none mb-[3px] block">Product Gallery</label>
+              react-hook-form fields (same reasoning as the thumbnail block above).
+              Required manually in handleSubmit for the same reason. */}
+          <label className="mb-2 block text-sm font-medium leading-none">
+            Product Gallery
+            <Required />
+          </label>
 
           <div
             role="button"
@@ -545,6 +568,8 @@ export function ProductForm({
             </div>
           )}
 
+          {galleryError && <p className="text-sm font-medium text-destructive">{galleryError}</p>}
+
           <p className="text-xs text-muted-foreground">
             Uploaded {isEditing ? "on save" : "after the product is created"}. Processing happens in the background.
           </p>
@@ -574,12 +599,13 @@ export function ProductForm({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel>
-                  Price (cents)
+                  Price (kopeks)
                   <Required />
                 </FormLabel>
                 <FormControl>
-                  <Input className="h-11 w-full rounded-lg" type="number" min={0} placeholder="Product price" {...field} />
+                  <Input className="h-11 w-full rounded-lg" type="number" min={0} placeholder="99900" {...field} />
                 </FormControl>
+                <FormDescription>Entered in kopeks — 99900 shows as 999,00 ₽.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
