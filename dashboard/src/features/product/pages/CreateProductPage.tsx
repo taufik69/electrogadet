@@ -12,7 +12,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ProductForm, type ProductFormSubmitValues } from "../components/product-form"
 import {
   useAttachProductCategory,
@@ -31,9 +31,12 @@ export function CreateProductPage() {
   const attachCategoryMutation = useAttachProductCategory()
   const upsertSeoMutation = useUpsertProductSeo()
   const [error, setError] = useState<string | null>(null)
+  const [justCreated, setJustCreated] = useState(false)
+  const [resetSignal, setResetSignal] = useState(0)
 
   function handleSubmit({ input, categoryId, thumbnailFile, galleryFiles, seo }: ProductFormSubmitValues) {
     setError(null)
+    setJustCreated(false)
     createMutation.mutate(input as CreateProductInput, {
       onSuccess: (product) => {
         // Fire-and-forget, same pattern as brand/category image uploads: the
@@ -47,10 +50,11 @@ export function CreateProductPage() {
         if (categoryId) {
           attachCategoryMutation.mutate({ categoryId, productId: product.id })
         }
-        if (Object.values(seo).some((v) => (Array.isArray(v) ? v.length > 0 : v !== undefined))) {
-          upsertSeoMutation.mutate({ productId: product.id, input: seo })
-        }
-        navigate("/products")
+        upsertSeoMutation.mutate({ productId: product.id, input: seo })
+        // Stay on this page instead of navigating away, so the admin can list
+        // another product right away — blank the form via resetSignal.
+        setJustCreated(true)
+        setResetSignal((n) => n + 1)
       },
       onError: (err) => setError(err.message),
     })
@@ -90,13 +94,25 @@ export function CreateProductPage() {
         </Alert>
       )}
 
-      <Card>
-        <CardContent className="pt-6">
+      {justCreated && (
+        <Alert>
+          <AlertTitle>Product created</AlertTitle>
+          <AlertDescription>The form has been reset — you can list another product now.</AlertDescription>
+        </Alert>
+      )}
+
+      <Card className="w-full rounded-2xl">
+        <CardHeader>
+          <CardTitle className="text-xl">Product Listing</CardTitle>
+          <CardDescription>List a new product for sale on our platform.</CardDescription>
+        </CardHeader>
+        <CardContent>
           <ProductForm
             isPending={createMutation.isPending}
             onSubmit={handleSubmit}
             onCancel={() => navigate("/products")}
             submitLabel="Create Product"
+            resetSignal={resetSignal}
           />
         </CardContent>
       </Card>

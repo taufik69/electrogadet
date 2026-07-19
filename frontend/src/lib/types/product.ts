@@ -3,7 +3,6 @@ export interface Product {
   name: string
   slug: string
   priceCents: number
-  compareAtCents?: number | null
   createdAt: string
   updatedAt: string
   /** Populated server-side (backend product.service.ts attachImages) — null until an upload finishes. */

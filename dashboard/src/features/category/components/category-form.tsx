@@ -23,6 +23,11 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import type { Category, CreateCategoryInput, UpdateCategoryInput } from "../types/category.types"
 
+/** Red asterisk suffix for labels of fields the backend actually requires. */
+function Required() {
+  return <span className="text-destructive"> *</span>
+}
+
 const schema = z.object({
   brandId: z.string().min(1, "Please select a brand"),
   name: z.string().min(1, "Name is required"),
@@ -118,7 +123,10 @@ export function CategoryForm({ category, isPending, onSubmit, onCancel, submitLa
           name="brandId"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>Brand</FormLabel>
+              <FormLabel>
+                Brand
+                <Required />
+              </FormLabel>
               <Select onValueChange={field.onChange} value={field.value} disabled={isEditing || brandsLoading}>
                 <FormControl>
                   <SelectTrigger className="w-full">
@@ -148,7 +156,10 @@ export function CategoryForm({ category, isPending, onSubmit, onCancel, submitLa
           name="name"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>Name</FormLabel>
+              <FormLabel>
+                Name
+                <Required />
+              </FormLabel>
               <FormControl>
                 <Input className="w-full" placeholder="Apple iPad" {...field} />
               </FormControl>

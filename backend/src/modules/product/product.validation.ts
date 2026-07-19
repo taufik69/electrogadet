@@ -15,11 +15,10 @@ export const createProductSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   priceCents: z.number().int().min(0),
-  compareAtCents: z.number().int().min(0).optional(),
   isActive: z.boolean().optional().default(true),
   sku: z.string().min(1).optional(),
-  barcode: z.string().min(1).optional(),
-  stock: z.number().int().min(0).optional().default(0),
+  barcode: z.string().min(1),
+  stock: z.number().int().min(0),
   availabilityStatus: availabilityStatusSchema.optional().default("in_stock"),
   warrantyInformation: z.string().optional(),
   shippingInformation: z.string().optional(),
@@ -42,8 +41,8 @@ export const listProductsQuerySchema = cursorPaginationSchema.extend({
 })
 
 export const upsertProductSeoSchema = z.object({
-  metaTitle: z.string().max(70).optional(),
-  metaDescription: z.string().max(200).optional(),
+  metaTitle: z.string().min(1).max(70),
+  metaDescription: z.string().min(1).max(200),
   metaKeywords: z.array(z.string().trim().toLowerCase()).optional(),
   canonicalUrl: z.string().url().optional(),
   focusKeyword: z.string().trim().toLowerCase().optional(),

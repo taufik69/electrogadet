@@ -10,7 +10,6 @@ export interface Product {
   slug: string
   description: string | null
   priceCents: number
-  compareAtCents: number | null
   isActive: boolean
   sku: string | null
   barcode: string | null
@@ -46,11 +45,10 @@ export interface CreateProductInput {
   name: string
   description?: string
   priceCents: number
-  compareAtCents?: number
   isActive?: boolean
   sku?: string
-  barcode?: string
-  stock?: number
+  barcode: string
+  stock: number
   availabilityStatus?: AvailabilityStatus
   warrantyInformation?: string
   shippingInformation?: string
@@ -77,8 +75,8 @@ export interface ProductSeo {
 }
 
 export interface UpsertProductSeoInput {
-  metaTitle?: string
-  metaDescription?: string
+  metaTitle: string
+  metaDescription: string
   metaKeywords?: string[]
   canonicalUrl?: string
   focusKeyword?: string

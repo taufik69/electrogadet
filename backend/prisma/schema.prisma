@@ -104,13 +104,12 @@ model Category {
 // ─── Catalog ─────────────────────────────────────────────────────────────────
 
 model Product {
-  id             String  @id @default(cuid())
-  name           String
-  slug           String  @unique
-  description    String?
-  priceCents     Int
-  compareAtCents Int?
-  isActive       Boolean @default(true)
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  priceCents  Int
+  isActive    Boolean @default(true)
 
   // Nullable + unique reproduces Mongo's `sparse: true`: Postgres allows
   // unlimited NULLs in a unique column, so products without a SKU don't collide.

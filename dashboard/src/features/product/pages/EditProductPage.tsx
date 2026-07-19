@@ -12,7 +12,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ProductForm, type ProductFormSubmitValues } from "../components/product-form"
 import {
@@ -63,9 +63,7 @@ export function EditProductPage() {
             }
           }
 
-          if (Object.values(seo).some((v) => (Array.isArray(v) ? v.length > 0 : v !== undefined))) {
-            upsertSeoMutation.mutate({ productId: id, input: seo })
-          }
+          upsertSeoMutation.mutate({ productId: id, input: seo })
 
           navigate("/products")
         },
@@ -124,8 +122,12 @@ export function EditProductPage() {
           </Button>
         </div>
       ) : (
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="w-full rounded-2xl">
+          <CardHeader>
+            <CardTitle className="text-xl">Edit Product</CardTitle>
+            <CardDescription>Update this product's details.</CardDescription>
+          </CardHeader>
+          <CardContent>
             <ProductForm
               product={product}
               existingGalleryCount={product.gallery.length}

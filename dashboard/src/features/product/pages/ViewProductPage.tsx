@@ -132,7 +132,6 @@ export function ViewProductPage() {
               <Field label="Brand" value={product.brand?.name} />
               <Field label="Category" value={category?.name} />
               <Field label="Price" value={formatPrice(product.priceCents)} />
-              <Field label="Compare-at price" value={formatPrice(product.compareAtCents)} />
               <Field label="Stock" value={product.stock} />
               <Field label="Availability" value={availabilityLabel[product.availabilityStatus]} />
               <Field label="SKU" value={product.sku} />

@@ -9,11 +9,10 @@ export interface CreateProductInput {
   name: string
   description?: string
   priceCents: number
-  compareAtCents?: number
   isActive?: boolean
   sku?: string
-  barcode?: string
-  stock?: number
+  barcode: string
+  stock: number
   availabilityStatus?: AvailabilityStatus
   warrantyInformation?: string
   shippingInformation?: string
@@ -29,8 +28,8 @@ export interface CreateProductInput {
 export type UpdateProductInput = Partial<CreateProductInput>
 
 export interface UpsertProductSeoInput {
-  metaTitle?: string
-  metaDescription?: string
+  metaTitle: string
+  metaDescription: string
   metaKeywords?: string[]
   canonicalUrl?: string
   focusKeyword?: string

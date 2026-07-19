@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Plus, X } from "lucide-react"
+import { Loader2, Plus, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -28,19 +28,15 @@ const availabilityStatusSchema = z.enum(["in_stock", "out_of_stock", "preorder"]
 
 const schema = z.object({
   brandId: z.string().optional(),
-  categoryId: z.string().optional(),
+  categoryId: z.string().min(1, "Please select a category"),
   name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
+  description: z.string().min(1, "Description is required"),
   priceCents: z
     .string()
     .min(1, "Price is required")
     .refine((v) => Number.isInteger(Number(v)) && Number(v) >= 0, "Price must be a whole number, 0 or more"),
-  compareAtCents: z
-    .string()
-    .optional()
-    .refine((v) => !v || (Number.isInteger(Number(v)) && Number(v) >= 0), "Must be a whole number, 0 or more"),
   sku: z.string().optional(),
-  barcode: z.string().optional(),
+  barcode: z.string().min(1, "Barcode is required"),
   stock: z
     .string()
     .min(1, "Stock is required")
@@ -51,8 +47,8 @@ const schema = z.object({
   manufactureCountry: z.string().optional(),
   tags: z.string().optional(),
   isActive: z.boolean(),
-  metaTitle: z.string().max(70, "Max 70 characters").optional(),
-  metaDescription: z.string().max(200, "Max 200 characters").optional(),
+  metaTitle: z.string().min(1, "Meta title is required").max(70, "Max 70 characters"),
+  metaDescription: z.string().min(1, "Meta description is required").max(200, "Max 200 characters"),
   metaKeywords: z.string().optional(),
   ogTitle: z.string().max(70, "Max 70 characters").optional(),
   ogDescription: z.string().max(200, "Max 200 characters").optional(),
@@ -63,9 +59,14 @@ type FormValues = z.infer<typeof schema>
 
 export const MAX_PRODUCT_GALLERY_IMAGES = 10
 
+/** Red asterisk suffix for labels of fields the backend actually requires. */
+function Required() {
+  return <span className="text-destructive"> *</span>
+}
+
 export interface ProductFormSeoValues {
-  metaTitle?: string
-  metaDescription?: string
+  metaTitle: string
+  metaDescription: string
   metaKeywords?: string[]
   ogTitle?: string
   ogDescription?: string
@@ -88,6 +89,8 @@ interface ProductFormProps {
   onSubmit: (values: ProductFormSubmitValues) => void
   onCancel: () => void
   submitLabel: string
+  /** Bump this (e.g. a counter) after a successful create to blank out the form for the next entry. */
+  resetSignal?: number
 }
 
 export function ProductForm({
@@ -97,6 +100,7 @@ export function ProductForm({
   onSubmit,
   onCancel,
   submitLabel,
+  resetSignal,
 }: ProductFormProps) {
   const isEditing = !!product
   const existingCategory = product?.categories?.[0]?.category
@@ -116,7 +120,9 @@ export function ProductForm({
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [thumbnailError, setThumbnailError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const hasExistingThumbnail = product?.thumbnail != null
 
   const [galleryFiles, setGalleryFiles] = useState<File[]>([])
   const [galleryPreviewUrls, setGalleryPreviewUrls] = useState<string[]>([])
@@ -133,7 +139,6 @@ export function ProductForm({
           name: product.name,
           description: product.description ?? "",
           priceCents: String(product.priceCents),
-          compareAtCents: product.compareAtCents != null ? String(product.compareAtCents) : "",
           sku: product.sku ?? "",
           barcode: product.barcode ?? "",
           stock: String(product.stock),
@@ -156,7 +161,6 @@ export function ProductForm({
           name: "",
           description: "",
           priceCents: "",
-          compareAtCents: "",
           sku: "",
           barcode: "",
           stock: "",
@@ -192,12 +196,30 @@ export function ProductForm({
     }
   }, [categoriesLoading, categories, form])
 
+  useEffect(() => {
+    // Only wired up on the create page (see resetSignal prop doc) — bumping
+    // this after a successful create blanks the form for the next entry
+    // instead of navigating away.
+    if (resetSignal === undefined) return
+    form.reset()
+    setSelectedBrandId(undefined)
+    setFile(null)
+    setGalleryPreviewUrls((prev) => {
+      prev.forEach((url) => URL.revokeObjectURL(url))
+      return []
+    })
+    setGalleryFiles([])
+    setThumbnailError(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetSignal])
+
   function setFile(file: File | null) {
     setThumbnailFile(file)
     setThumbnailPreviewUrl((previous) => {
       if (previous) URL.revokeObjectURL(previous)
       return file ? URL.createObjectURL(file) : null
     })
+    if (file) setThumbnailError(null)
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -244,6 +266,13 @@ export function ProductForm({
   }
 
   function handleSubmit(values: FormValues) {
+    // Thumbnail isn't an RHF field (see setFile/thumbnailFile above), so its
+    // required check can't live in the zod schema — gate the submit here instead.
+    if (!thumbnailFile && !hasExistingThumbnail) {
+      setThumbnailError("Thumbnail is required")
+      return
+    }
+
     const tags = values.tags
       ? values.tags
           .split(",")
@@ -261,9 +290,8 @@ export function ProductForm({
       name: values.name,
       description: values.description || undefined,
       priceCents: Number(values.priceCents),
-      compareAtCents: values.compareAtCents ? Number(values.compareAtCents) : undefined,
       sku: values.sku || undefined,
-      barcode: values.barcode || undefined,
+      barcode: values.barcode,
       stock: Number(values.stock),
       availabilityStatus: values.availabilityStatus,
       warrantyInformation: values.warrantyInformation || undefined,
@@ -280,8 +308,8 @@ export function ProductForm({
       thumbnailFile,
       galleryFiles,
       seo: {
-        metaTitle: values.metaTitle || undefined,
-        metaDescription: values.metaDescription || undefined,
+        metaTitle: values.metaTitle,
+        metaDescription: values.metaDescription,
         metaKeywords,
         ogTitle: values.ogTitle || undefined,
         ogDescription: values.ogDescription || undefined,
@@ -294,7 +322,7 @@ export function ProductForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full space-y-6">
         <div className="grid w-full gap-4 sm:grid-cols-2">
           <div className="w-full space-y-2">
             {/* Plain <label>, not FormLabel/FormItem — brand selection drives
@@ -303,7 +331,7 @@ export function ProductForm({
                 context (same reasoning as the thumbnail upload block below). */}
             <label className="text-sm font-medium leading-none mb-[3px] block">Brand</label>
             <Select value={selectedBrandId} onValueChange={handleBrandChange} disabled={brandsLoading}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="h-11 w-full rounded-lg">
                 <SelectValue placeholder={brandsLoading ? "Loading..." : "Select a brand"} />
               </SelectTrigger>
               <SelectContent>
@@ -322,14 +350,17 @@ export function ProductForm({
             name="categoryId"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Category</FormLabel>
+                <FormLabel className="mb-2">
+                  Category
+                  <Required />
+                </FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   value={field.value}
                   disabled={!selectedBrandId || categoriesLoading}
                 >
                   <FormControl>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="h-11 w-full rounded-lg">
                       <SelectValue
                         placeholder={
                           !selectedBrandId
@@ -361,9 +392,12 @@ export function ProductForm({
           name="name"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>Name</FormLabel>
+              <FormLabel>
+                Product Name
+                <Required />
+              </FormLabel>
               <FormControl>
-                <Input className="w-full" placeholder="iPad Pro 13&quot; M5 (2025)" {...field} />
+                <Input className="h-11 w-full rounded-lg" placeholder="Product title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -376,7 +410,7 @@ export function ProductForm({
                 it's not registered with react-hook-form at all. It's
                 generated server-side from the name and shown here read-only. */}
             <label className="text-sm font-medium leading-none mb-[3px] block">Slug</label>
-            <Input className="w-full" value={product.slug} disabled readOnly />
+            <Input className="h-11 w-full rounded-lg" value={product.slug} disabled readOnly />
             <p className="text-sm text-muted-foreground">
               Generated automatically from the name. Used in the storefront URL /products/&lt;slug&gt; and can&apos;t
               be changed.
@@ -387,8 +421,13 @@ export function ProductForm({
         <div className="w-full space-y-2">
           {/* Plain <label>, not FormLabel — thumbnailFile/previewUrl are
               useState, not react-hook-form fields (same reasoning as
-              category-form.tsx's image block). */}
-          <label className="text-sm font-medium leading-none mb-[3px] block">Product Thumbnail</label>
+              category-form.tsx's image block). Required manually in
+              handleSubmit below since there's no RHF field to attach a zod
+              rule to. */}
+          <label className="mb-2 block text-sm font-medium leading-none">
+            Product Thumbnail
+            <Required />
+          </label>
 
           <div
             role="button"
@@ -435,6 +474,8 @@ export function ProductForm({
           </div>
 
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+
+          {thumbnailError && <p className="text-sm font-medium text-destructive">{thumbnailError}</p>}
 
           <p className="text-xs text-muted-foreground">
             {isEditing
@@ -514,9 +555,12 @@ export function ProductForm({
           name="description"
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel>Description</FormLabel>
+              <FormLabel className="mb-2">
+                Product Description
+                <Required />
+              </FormLabel>
               <FormControl>
-                <Textarea className="w-full" placeholder="Product description" rows={3} {...field} />
+                <Textarea className="w-full rounded-lg" placeholder="Detailed product description" rows={4} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -529,23 +573,12 @@ export function ProductForm({
             name="priceCents"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Price (cents)</FormLabel>
+                <FormLabel>
+                  Price (cents)
+                  <Required />
+                </FormLabel>
                 <FormControl>
-                  <Input className="w-full" type="number" min={0} placeholder="99900" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="compareAtCents"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Compare-at price (cents)</FormLabel>
-                <FormControl>
-                  <Input className="w-full" type="number" min={0} placeholder="Optional" {...field} />
+                  <Input className="h-11 w-full rounded-lg" type="number" min={0} placeholder="Product price" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -557,9 +590,12 @@ export function ProductForm({
             name="stock"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Stock</FormLabel>
+                <FormLabel>
+                  Stock
+                  <Required />
+                </FormLabel>
                 <FormControl>
-                  <Input className="w-full" type="number" min={0} {...field} />
+                  <Input className="h-11 w-full rounded-lg" type="number" min={0} placeholder="Available quantity" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -574,7 +610,7 @@ export function ProductForm({
                 <FormLabel>Availability</FormLabel>
                 <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="h-11 w-full rounded-lg">
                       <SelectValue />
                     </SelectTrigger>
                   </FormControl>
@@ -596,7 +632,7 @@ export function ProductForm({
               <FormItem className="w-full">
                 <FormLabel>SKU</FormLabel>
                 <FormControl>
-                  <Input className="w-full" placeholder="Optional" {...field} />
+                  <Input className="h-11 w-full rounded-lg" placeholder="Product SKU" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -608,9 +644,12 @@ export function ProductForm({
             name="barcode"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Barcode</FormLabel>
+                <FormLabel>
+                  Barcode
+                  <Required />
+                </FormLabel>
                 <FormControl>
-                  <Input className="w-full" placeholder="Optional" {...field} />
+                  <Input className="h-11 w-full rounded-lg" placeholder="Product barcode" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -624,7 +663,7 @@ export function ProductForm({
               <FormItem className="w-full">
                 <FormLabel>Manufacture country</FormLabel>
                 <FormControl>
-                  <Input className="w-full" placeholder="Optional" {...field} />
+                  <Input className="h-11 w-full rounded-lg" placeholder="Country of origin" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -638,7 +677,7 @@ export function ProductForm({
               <FormItem className="w-full">
                 <FormLabel>Tags</FormLabel>
                 <FormControl>
-                  <Input className="w-full" placeholder="wireless, noise-cancelling" {...field} />
+                  <Input className="h-11 w-full rounded-lg" placeholder="wireless, noise-cancelling" {...field} />
                 </FormControl>
                 <FormDescription>Comma-separated.</FormDescription>
                 <FormMessage />
@@ -654,7 +693,7 @@ export function ProductForm({
             <FormItem className="w-full">
               <FormLabel>Warranty information</FormLabel>
               <FormControl>
-                <Input className="w-full" placeholder="Optional" {...field} />
+                <Input className="h-11 w-full rounded-lg" placeholder="e.g. 1 year manufacturer warranty" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -668,7 +707,7 @@ export function ProductForm({
             <FormItem className="w-full">
               <FormLabel>Shipping information</FormLabel>
               <FormControl>
-                <Input className="w-full" placeholder="Optional" {...field} />
+                <Input className="h-11 w-full rounded-lg" placeholder="e.g. Ships within 3-5 business days" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -689,9 +728,12 @@ export function ProductForm({
               name="metaTitle"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Meta title</FormLabel>
+                  <FormLabel>
+                    Meta title
+                    <Required />
+                  </FormLabel>
                   <FormControl>
-                    <Input className="w-full" placeholder="Optional — defaults to product name" {...field} />
+                    <Input className="h-11 w-full rounded-lg" placeholder="Title shown in search results" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -705,7 +747,7 @@ export function ProductForm({
                 <FormItem className="w-full">
                   <FormLabel>Canonical URL</FormLabel>
                   <FormControl>
-                    <Input className="w-full" placeholder="Optional" {...field} />
+                    <Input className="h-11 w-full rounded-lg" placeholder="https://example.com/products/..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -718,9 +760,12 @@ export function ProductForm({
             name="metaDescription"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Meta description</FormLabel>
+                <FormLabel>
+                  Meta description
+                  <Required />
+                </FormLabel>
                 <FormControl>
-                  <Textarea className="w-full" placeholder="Optional" rows={2} {...field} />
+                  <Textarea className="w-full rounded-lg" placeholder="Description shown in search results" rows={2} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -734,7 +779,7 @@ export function ProductForm({
               <FormItem className="w-full">
                 <FormLabel>Meta keywords</FormLabel>
                 <FormControl>
-                  <Input className="w-full" placeholder="wireless, noise-cancelling" {...field} />
+                  <Input className="h-11 w-full rounded-lg" placeholder="wireless, noise-cancelling" {...field} />
                 </FormControl>
                 <FormDescription>Comma-separated.</FormDescription>
                 <FormMessage />
@@ -750,7 +795,7 @@ export function ProductForm({
                 <FormItem className="w-full">
                   <FormLabel>Social share title</FormLabel>
                   <FormControl>
-                    <Input className="w-full" placeholder="Optional — defaults to meta title" {...field} />
+                    <Input className="h-11 w-full rounded-lg" placeholder="Optional — defaults to meta title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -764,7 +809,7 @@ export function ProductForm({
                 <FormItem className="w-full">
                   <FormLabel>Social share description</FormLabel>
                   <FormControl>
-                    <Input className="w-full" placeholder="Optional — defaults to meta description" {...field} />
+                    <Input className="h-11 w-full rounded-lg" placeholder="Optional — defaults to meta description" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -791,12 +836,13 @@ export function ProductForm({
           )}
         />
 
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isPending}>
+        <div className="flex flex-col gap-2">
+          <Button type="submit" className="h-12 w-full rounded-lg text-base" disabled={isPending}>
+            {isPending && <Loader2 className="size-4 animate-spin" />}
             {isPending ? "Saving..." : submitLabel}
+          </Button>
+          <Button type="button" variant="outline" className="h-11 w-full rounded-lg" onClick={onCancel}>
+            Cancel
           </Button>
         </div>
       </form>
