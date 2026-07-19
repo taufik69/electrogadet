@@ -2,7 +2,7 @@ import { ApiError } from "../../shared/helpers/ApiError.js"
 import { bumpCacheVersion } from "../../shared/utils/cache.js"
 import { enqueueImageDelete, enqueueImageUpload } from "../../shared/queues/image.queue.js"
 import { imageRepository } from "./image.repository.js"
-import { IMAGE_CACHE_NAMESPACE, MAX_PRODUCT_GALLERY_IMAGES } from "./image.constant.js"
+import { IMAGE_CACHE_NAMESPACE, MAX_BANNER_IMAGES, MAX_PRODUCT_GALLERY_IMAGES } from "./image.constant.js"
 import type { ImageOwnerType } from "../../generated/prisma/enums.js"
 import type { CreateImageInput, ReorderImageItem } from "./image.types.js"
 
@@ -22,6 +22,15 @@ export const imageService = {
       const count = await imageRepository.countByOwner(input.ownerType, input.ownerId)
       if (count >= MAX_PRODUCT_GALLERY_IMAGES) {
         throw ApiError.conflict(`A product's gallery cannot exceed ${MAX_PRODUCT_GALLERY_IMAGES} images`)
+      }
+    }
+
+    // A banner carries exactly one image (banner spec §4.2). Replacing it is
+    // delete-then-upload — the delete already enqueues Cloudinary cleanup.
+    if (input.ownerType === "banner") {
+      const count = await imageRepository.countByOwner(input.ownerType, input.ownerId)
+      if (count >= MAX_BANNER_IMAGES) {
+        throw ApiError.conflict("A banner can only have one image — delete the existing one first")
       }
     }
 

@@ -1,6 +1,13 @@
 import { z } from "zod"
+import { ImageOwnerType } from "../../generated/prisma/enums.js"
 
-const ownerTypeSchema = z.enum(["product_gallery", "product_thumbnail", "seo_og", "brand", "category"])
+/**
+ * Derived from the Prisma enum rather than hand-listed: a hardcoded copy
+ * silently rejects any newly-added owner type at the zod boundary until
+ * someone remembers to update it here too (this is exactly how `banner`
+ * initially 400'd after being added to schema.prisma).
+ */
+const ownerTypeSchema = z.enum(ImageOwnerType)
 
 export const listImagesQuerySchema = z.object({
   ownerType: ownerTypeSchema,

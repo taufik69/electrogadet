@@ -10,6 +10,7 @@ import { IMAGE_QUEUE_NAME, type ImageJobData } from "./shared/queues/image.queue
 import { IMAGE_CACHE_NAMESPACE } from "./modules/image/image.constant.js"
 import { BRAND_CACHE_NAMESPACE } from "./modules/brand/brand.constant.js"
 import { CATEGORY_CACHE_NAMESPACE } from "./modules/category/category.constant.js"
+import { BANNER_CACHE_NAMESPACE } from "./modules/banner/banner.constant.js"
 
 /**
  * Standalone process — run via `npm run worker`, never imported by the API
@@ -28,6 +29,11 @@ function cacheNamespacesForOwner(ownerType: string): string[] {
       return [BRAND_CACHE_NAMESPACE, NAVIGATION_CACHE_NAMESPACE]
     case "category":
       return [CATEGORY_CACHE_NAMESPACE, NAVIGATION_CACHE_NAMESPACE]
+    // Banner list/active reads embed the image (banner spec §2.1), so without
+    // this the carousel serves a stale `image: null` until the TTL expires.
+    // Banners aren't in the sidebar tree, so "navigation" is not bumped.
+    case "banner":
+      return [BANNER_CACHE_NAMESPACE, IMAGE_CACHE_NAMESPACE]
     default:
       return [IMAGE_CACHE_NAMESPACE]
   }

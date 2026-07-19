@@ -29,6 +29,7 @@ enum ImageOwnerType {
   seo_og
   brand
   category
+  banner
 }
 
 enum TwitterCard {
@@ -184,6 +185,27 @@ model ProductSeo {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ─── Marketing ───────────────────────────────────────────────────────────────
+
+/// Homepage promo carousel slide. Deliberately minimal (spec §2.2): no slug
+/// (never addressable by URL), no sortOrder (ordering is createdAt DESC, §2.4),
+/// and no imageUrl column — banners join Image by ownerId the way Product does
+/// rather than denormalizing like Brand/Category (§2.1).
+model Banner {
+  id          String  @id @default(cuid())
+  title       String
+  /// Required, not optional: the carousel always renders a subtitle line, and a
+  /// null would leave a visible empty gap in the overlay.
+  description String
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Serves the storefront's exact query: WHERE isActive ORDER BY createdAt DESC.
+  @@index([isActive, createdAt(sort: Desc)])
 }
 
 // ─── Media ───────────────────────────────────────────────────────────────────

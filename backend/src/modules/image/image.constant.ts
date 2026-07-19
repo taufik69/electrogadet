@@ -5,3 +5,6 @@ export const UPLOAD_TMP_DIR = "tmp/uploads"
 
 /** A product's gallery (ownerType "product_gallery") is capped at this many images. */
 export const MAX_PRODUCT_GALLERY_IMAGES = 10
+
+/** A banner carries exactly one image (banner spec §2.3/§4.2). */
+export const MAX_BANNER_IMAGES = 1

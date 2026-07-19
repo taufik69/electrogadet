@@ -19,6 +19,10 @@ const CreateCategoryPage = lazy(() =>
 )
 const EditCategoryPage = lazy(() => import("@/features/category").then((m) => ({ default: m.EditCategoryPage })))
 
+const BannersPage = lazy(() => import("@/features/banner").then((m) => ({ default: m.BannersPage })))
+const CreateBannerPage = lazy(() => import("@/features/banner").then((m) => ({ default: m.CreateBannerPage })))
+const EditBannerPage = lazy(() => import("@/features/banner").then((m) => ({ default: m.EditBannerPage })))
+
 function RouteFallback() {
   return (
     <div className="space-y-2">
@@ -47,6 +51,10 @@ export function AppRoutes() {
           <Route path="/categories" element={<CategoriesPage />} />
           <Route path="/categories/new" element={<CreateCategoryPage />} />
           <Route path="/categories/:id/edit" element={<EditCategoryPage />} />
+
+          <Route path="/banners" element={<BannersPage />} />
+          <Route path="/banners/new" element={<CreateBannerPage />} />
+          <Route path="/banners/:id/edit" element={<EditBannerPage />} />
         </Route>
       </Routes>
     </Suspense>

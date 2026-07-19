@@ -6,6 +6,7 @@ import { categoryRouter } from "./modules/category/category.routes.js"
 import { productRouter } from "./modules/product/product.routes.js"
 import { navigationRouter } from "./modules/navigation/navigation.routes.js"
 import { imageRouter } from "./modules/image/image.routes.js"
+import { bannerRouter } from "./modules/banner/banner.routes.js"
 import { errorHandler } from "./shared/middlewares/errorHandler.js"
 
 export const app = express()
@@ -25,5 +26,6 @@ app.use("/api/categories", categoryRouter)
 app.use("/api/products", productRouter)
 app.use("/api/navigation", navigationRouter)
 app.use("/api/images", imageRouter)
+app.use("/api/banners", bannerRouter)
 
 app.use(errorHandler)
