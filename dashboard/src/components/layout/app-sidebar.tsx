@@ -1,4 +1,4 @@
-import { ChevronRight, GalleryHorizontalEnd, Layers, List, Package, Plus, Tags, Zap } from "lucide-react"
+import { ChevronRight, GalleryHorizontalEnd, Layers, List, Newspaper, Package, Plus, Tags, Zap } from "lucide-react"
 import { Link, useLocation } from "react-router"
 
 import { NavUser } from "@/components/nav-user"
@@ -56,6 +56,15 @@ const collapsibleNav = [
     items: [
       { title: "Create Banner", url: "/banners/new", icon: Plus },
       { title: "Banner List", url: "/banners", icon: List },
+    ],
+  },
+  {
+    title: "Article",
+    icon: Newspaper,
+    basePath: "/articles",
+    items: [
+      { title: "Create Article", url: "/articles/new", icon: Plus },
+      { title: "Article List", url: "/articles", icon: List },
     ],
   },
 ]

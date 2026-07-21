@@ -11,6 +11,7 @@ import { IMAGE_CACHE_NAMESPACE } from "./modules/image/image.constant.js"
 import { BRAND_CACHE_NAMESPACE } from "./modules/brand/brand.constant.js"
 import { CATEGORY_CACHE_NAMESPACE } from "./modules/category/category.constant.js"
 import { BANNER_CACHE_NAMESPACE } from "./modules/banner/banner.constant.js"
+import { ARTICLE_CACHE_NAMESPACE } from "./modules/article/article.constant.js"
 
 /**
  * Standalone process — run via `npm run worker`, never imported by the API
@@ -34,6 +35,11 @@ function cacheNamespacesForOwner(ownerType: string): string[] {
     // Banners aren't in the sidebar tree, so "navigation" is not bumped.
     case "banner":
       return [BANNER_CACHE_NAMESPACE, IMAGE_CACHE_NAMESPACE]
+    // Article list/detail reads embed the cover (article spec §2.3), and the
+    // detail read uses CACHE_TTL.LONG — without this bump a freshly uploaded
+    // cover would stay invisible for an hour, not five minutes.
+    case "article_cover":
+      return [ARTICLE_CACHE_NAMESPACE, IMAGE_CACHE_NAMESPACE]
     default:
       return [IMAGE_CACHE_NAMESPACE]
   }
@@ -86,10 +92,14 @@ async function handleUploadJob(job: Job<ImageJobData>) {
 
     await writeDenormalizedImageUrl(ownerType, ownerId, uploaded.optimizeUrl)
 
+    // Replace path: the old asset is removed only after the new upload has
+    // succeeded, so a failed upload never leaves the owner with no image.
+    // Logged on success too — a silent delete is indistinguishable from a
+    // skipped one when tracing why an asset vanished from Cloudinary.
     if (oldPublicId) {
-      deleteCloudinaryFile(oldPublicId).catch((e: Error) =>
-        console.error("[Worker] Old image delete failed:", e.message),
-      )
+      deleteCloudinaryFile(oldPublicId)
+        .then(() => console.log(`[Worker] Old image deleted: ${oldPublicId} (replaced by ${imageId})`))
+        .catch((e: Error) => console.error(`[Worker] Old image delete failed: ${oldPublicId}:`, e.message))
     }
 
     await fs.unlink(localPath).catch(() => {})
@@ -128,6 +138,10 @@ async function handleDeleteJob(job: Job<ImageJobData>) {
   const { publicId } = job.data as { publicId: string }
   console.log(`[Worker] Deleting Cloudinary asset: ${publicId}`)
   await deleteCloudinaryFile(publicId)
+  // Confirm *after* the call resolves — the line above only proves the job
+  // started, and a rejection there would otherwise leave a log that reads as
+  // though the asset had been removed.
+  console.log(`[Worker] Cloudinary asset deleted: ${publicId}`)
   return { publicId, deleted: true }
 }
 

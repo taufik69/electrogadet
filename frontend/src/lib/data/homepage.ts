@@ -8,36 +8,6 @@ import {
   Tag,
 } from "lucide-react"
 
-/** Category tiles shown between the bestseller strip and the popular rail. */
-export interface CategoryTile {
-  name: string
-  slug: string
-  imageUrl: string
-}
-
-export const categoryTiles: CategoryTile[] = [
-  {
-    name: "Tablets",
-    slug: "tablets",
-    imageUrl: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&q=80",
-  },
-  {
-    name: "Smartphones",
-    slug: "smartphones",
-    imageUrl: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80",
-  },
-  {
-    name: "Laptops",
-    slug: "laptops",
-    imageUrl: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&q=80",
-  },
-  {
-    name: "Smartwatch",
-    slug: "smartwatch",
-    imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",
-  },
-]
-
 /** Service benefits row. */
 export interface Benefit {
   title: string
@@ -78,38 +48,10 @@ export const benefits: Benefit[] = [
   },
 ]
 
-/** Editorial articles. */
-export interface Article {
-  title: string
-  slug: string
-  imageUrl: string
-  publishedAt: string
-  views: number
-}
-
-export const articles: Article[] = [
-  {
-    title: "iPhone 17 Pro vs iPhone 16 Pro: is the upgrade worth it in 2026?",
-    slug: "iphone-17-pro-vs-16-pro",
-    imageUrl: "https://images.unsplash.com/photo-1592286927505-1def25115558?w=800&q=80",
-    publishedAt: "2026-06-14",
-    views: 15300,
-  },
-  {
-    title: "Which iPhone 17 case actually protects your phone?",
-    slug: "best-iphone-17-cases",
-    imageUrl: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=800&q=80",
-    publishedAt: "2026-06-02",
-    views: 9716,
-  },
-  {
-    title: "Setting up a new Mac: the first ten things to do",
-    slug: "new-mac-setup-guide",
-    imageUrl: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80",
-    publishedAt: "2026-05-21",
-    views: 7420,
-  },
-]
+// Editorial articles now come from the backend — see src/lib/articles.ts and
+// src/lib/types/article.ts. The hardcoded array that used to live here was
+// deleted with the API integration: leaving a stale copy alongside live data is
+// how the two silently diverge.
 
 /** Wide promo banners near the page foot. */
 export interface FootPromo {

@@ -30,6 +30,16 @@ enum ImageOwnerType {
   brand
   category
   banner
+  article_cover
+}
+
+/// draft/published control listing visibility; `archived` retires an article
+/// from listings while keeping its URL resolvable, so inbound links and search
+/// results don't 404 (article spec §2.8).
+enum ArticleStatus {
+  draft
+  published
+  archived
 }
 
 enum TwitterCard {
@@ -206,6 +216,79 @@ model Banner {
 
   // Serves the storefront's exact query: WHERE isActive ORDER BY createdAt DESC.
   @@index([isActive, createdAt(sort: Desc)])
+}
+
+// ─── Editorial ───────────────────────────────────────────────────────────────
+
+/// Editorial article (blog post / buying guide). Unlike Banner, articles are
+/// addressable by URL, so they carry a unique slug the way Product does.
+///
+/// No `excerpt` column (spec §2.11): the card design shows no summary line, and
+/// the SEO metaDescription falls back to a truncation of `content` derived at
+/// read time rather than a stored copy that would drift on every edit.
+model Article {
+  id    String @id @default(cuid())
+  title String
+  /// Derived server-side from `title` (slugify + -2/-3 collision suffix), never
+  /// client-supplied — see spec §2.10. Write-once: not regenerated when the
+  /// title changes, because a published URL is in search indexes already.
+  slug  String @unique
+  /// Markdown body, not Json: it's an authored document rendered as-is, so an
+  /// editor-specific JSON schema would lock content to that editor forever
+  /// (spec §2.7). Requires sanitization at render time.
+  content String
+
+  /// Nullable: there is no User model in this backend yet (spec §1.3), so a
+  /// byline is a plain string until auth lands. Additive path to a real FK.
+  authorName String?
+  tags       String[]
+
+  status      ArticleStatus @default(draft)
+  /// Set when status first flips to published; this is the date rendered on
+  /// every card — not createdAt, so an article drafted in March and published
+  /// in June displays June. Never cleared on unpublish (spec §2.4).
+  publishedAt DateTime?
+
+  /// Denormalized counter incremented fire-and-forget on detail reads. Not an
+  /// event table: the design shows only a total, so per-view rows would be
+  /// written and never queried. Deliberately does not bust the cache on
+  /// increment, or every read would invalidate itself (spec §2.5).
+  viewCount Int @default(0)
+
+  seo ArticleSeo?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Serves the storefront's exact query:
+  // WHERE status = 'published' ORDER BY publishedAt DESC.
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+}
+
+/// Mirrors ProductSeo exactly — same columns, same VarChar caps, same cascade.
+/// Articles are the most SEO-sensitive content in the storefront, so they get
+/// the full set rather than a subset.
+model ArticleSeo {
+  id        String  @id @default(cuid())
+  articleId String  @unique
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  metaTitle       String?     @db.VarChar(70)
+  metaDescription String?     @db.VarChar(200)
+  metaKeywords    String[]
+  canonicalUrl    String?
+  focusKeyword    String?
+  ogTitle         String?     @db.VarChar(70)
+  ogDescription   String?     @db.VarChar(200)
+  twitterCard     TwitterCard @default(summary_large_image)
+  /// JSON-LD. Json because it is genuinely schemaless and never queried by shape.
+  structuredData  Json?
+  noIndex         Boolean     @default(false)
+  noFollow        Boolean     @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ─── Media ───────────────────────────────────────────────────────────────────

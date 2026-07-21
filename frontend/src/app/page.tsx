@@ -8,10 +8,13 @@ import { FootPromos } from "@/app/_components/foot-promos"
 import { Testimonials } from "@/app/_components/testimonials"
 import { Faq } from "@/app/_components/faq"
 import { fetchProducts } from "@/lib/products"
+import { fetchPublishedArticles } from "@/lib/articles"
 import { toProductCardDataList } from "@/lib/data/product-display"
 
 export default async function Home() {
-  const products = await fetchProducts(16)
+  // Parallel, not sequential: these are independent reads, and awaiting them in
+  // series would add the articles round trip to the page's TTFB for no reason.
+  const [products, articles] = await Promise.all([fetchProducts(16), fetchPublishedArticles(3)])
   const cardData = toProductCardDataList(products)
 
   const newArrivals = [...cardData]
@@ -51,7 +54,7 @@ export default async function Home() {
 
       <Benefits />
 
-      <Articles />
+      <Articles articles={articles} />
 
       <FootPromos />
 

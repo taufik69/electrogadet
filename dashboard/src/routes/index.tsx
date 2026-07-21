@@ -23,6 +23,12 @@ const BannersPage = lazy(() => import("@/features/banner").then((m) => ({ defaul
 const CreateBannerPage = lazy(() => import("@/features/banner").then((m) => ({ default: m.CreateBannerPage })))
 const EditBannerPage = lazy(() => import("@/features/banner").then((m) => ({ default: m.EditBannerPage })))
 
+const ArticlesPage = lazy(() => import("@/features/article").then((m) => ({ default: m.ArticlesPage })))
+const CreateArticlePage = lazy(() =>
+  import("@/features/article").then((m) => ({ default: m.CreateArticlePage })),
+)
+const EditArticlePage = lazy(() => import("@/features/article").then((m) => ({ default: m.EditArticlePage })))
+
 function RouteFallback() {
   return (
     <div className="space-y-2">
@@ -55,6 +61,10 @@ export function AppRoutes() {
           <Route path="/banners" element={<BannersPage />} />
           <Route path="/banners/new" element={<CreateBannerPage />} />
           <Route path="/banners/:id/edit" element={<EditBannerPage />} />
+
+          <Route path="/articles" element={<ArticlesPage />} />
+          <Route path="/articles/new" element={<CreateArticlePage />} />
+          <Route path="/articles/:id/edit" element={<EditArticlePage />} />
         </Route>
       </Routes>
     </Suspense>

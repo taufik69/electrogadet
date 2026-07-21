@@ -35,8 +35,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<ApiSuccess<
  * itself. Setting it manually (as `request()` does for JSON) would omit the
  * boundary and the server couldn't parse the body.
  */
-export async function apiUpload<T>(path: string, formData: FormData): Promise<T> {
-  const res = await fetch(`${API_URL}${path}`, { method: "POST", body: formData })
+export async function apiUpload<T>(path: string, formData: FormData, method: "POST" | "PUT" = "POST"): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, { method, body: formData })
 
   if (!res.ok) {
     const body = await res.json().catch(() => null)

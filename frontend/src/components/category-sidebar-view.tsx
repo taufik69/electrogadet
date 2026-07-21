@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
@@ -23,7 +24,7 @@ export function CategorySidebarView({ brands }: { brands: SidebarBrand[] }) {
   return (
     // Outer wrapper stretches the dark surface down past the footer;
     // the inner column sticks to the viewport as you scroll.
-    <div className="relative z-30 hidden w-[314px] shrink-0 border-r border-sidebar-border bg-gradient-to-b from-sidebar-elevated to-sidebar lg:block">
+    <div className="relative z-30 hidden w-[330px] shrink-0 border-r border-sidebar-border bg-gradient-to-b from-sidebar-elevated to-sidebar lg:block">
       <div className="sticky top-0 flex h-screen flex-col" onMouseLeave={close}>
         {/* Brand mark — centered at the top of the sidebar column */}
         <BrandMark />
@@ -34,20 +35,45 @@ export function CategorySidebarView({ brands }: { brands: SidebarBrand[] }) {
           {/* Brand logo rail */}
           <div
             aria-hidden
-            className="flex w-16 shrink-0 flex-col items-center border-r border-sidebar-border py-2"
+            className="flex w-20 shrink-0 flex-col items-center border-r border-sidebar-border py-2"
           >
             {/* Spacer matching the nav's "Shop by brand" heading so icons align with rows */}
             <span aria-hidden className="h-9 shrink-0" />
             {brands.map((b) => {
               const Logo = resolveBrandIcon(b.iconKey);
+              const isActive = b.slug === activeBrand;
               return (
                 <span
                   key={b.slug}
-                  className={`flex h-[46px] w-full shrink-0 items-center justify-center border-b border-sidebar-border/50 transition-colors duration-150 ${
-                    b.slug === activeBrand ? "text-white" : "text-white/50"
+                  className={`flex h-[64px] w-full shrink-0 items-center justify-center border-b border-sidebar-border/50 transition-colors duration-150 ${
+                    isActive ? "text-white" : "text-white/50"
                   }`}
                 >
-                  {Logo && <Logo className="size-5" />}
+                  {/* An uploaded logo wins over the bundled react-icons glyph:
+                      iconKey only covers the 14 brands in brand-icons.ts, while
+                      imageUrl is whatever the dashboard uploaded. Falls back to
+                      the glyph, then to the brand's initial, so the rail never
+                      renders an empty cell and stays aligned with its rows. */}
+                  {b.imageUrl ? (
+                    <Image
+                      src={b.imageUrl}
+                      alt=""
+                      width={96}
+                      height={96}
+                      // object-contain + explicit box: logos arrive at wildly
+                      // different aspect ratios, so letterbox them into a
+                      // square rather than letting a wide logo dictate the row.
+                      className={`size-12 rounded-sm object-contain transition-opacity duration-150 ${
+                        isActive ? "opacity-100" : "opacity-70"
+                      }`}
+                    />
+                  ) : Logo ? (
+                    <Logo className="size-7" />
+                  ) : (
+                    <span className="text-small-semibold">
+                      {b.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
                 </span>
               );
             })}
@@ -72,7 +98,7 @@ export function CategorySidebarView({ brands }: { brands: SidebarBrand[] }) {
                     setActiveBrand(b.slug);
                     setActiveCategory(b.categories[0]?.slug ?? null);
                   }}
-                  className={`relative flex h-[46px] shrink-0 items-center justify-between border-b border-sidebar-border/50 px-5 text-small-semibold transition-colors duration-150 ${
+                  className={`relative flex h-[64px] shrink-0 items-center justify-between border-b border-sidebar-border/50 px-5 text-small-semibold transition-colors duration-150 ${
                     isActive
                       ? "bg-white/10 text-white"
                       : "text-white/85 hover:bg-white/10 hover:text-white"
@@ -99,7 +125,7 @@ export function CategorySidebarView({ brands }: { brands: SidebarBrand[] }) {
 
         {/* Flyouts — brand categories, then that category's products */}
         {brand && brand.categories.length > 0 && (
-          <div className="absolute top-[102px] bottom-0 left-[314px] z-50 flex">
+          <div className="absolute top-[102px] bottom-0 left-[330px] z-50 flex">
             <div className="flex w-[245px] shrink-0 flex-col overflow-y-auto border-r border-sidebar-border bg-gradient-to-b from-sidebar-elevated to-sidebar pt-11 pb-2 shadow-e3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {brand.categories.map((cat) => {
                 const isActive = cat.slug === activeCategory;
